@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ShopEase</string>
+    <string name="title_activity_main">ShopEase</string>
+    <string name="package_name">com.shopease.app</string>
+    <string name="custom_url_scheme">com.shopease.app</string>
+</resources>

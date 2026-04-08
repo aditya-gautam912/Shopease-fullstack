@@ -1,0 +1,203 @@
+/* src/index.css — Global styles for ShopEase */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: #6c63ff;
+    --color-primary-glow: rgba(108, 99, 255, 0.3);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 font-sans antialiased;
+    @apply dark:bg-gray-950 dark:text-gray-100;
+    transition: background-color 0.3s, color 0.3s;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Prevent zoom on input focus (iOS) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  @media (min-width: 640px) {
+    input, select, textarea {
+      font-size: inherit !important;
+    }
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-900;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+  }
+
+  /* Hide scrollbar on mobile for horizontal scrolls */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  /* Skeleton shimmer animation */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      theme('colors.gray.200') 0%,
+      theme('colors.gray.100') 50%,
+      theme('colors.gray.200') 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    @apply rounded;
+  }
+
+  .dark .skeleton {
+    background: linear-gradient(
+      90deg,
+      theme('colors.gray.800') 0%,
+      theme('colors.gray.700') 50%,
+      theme('colors.gray.800') 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* Focus ring for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+    @apply dark:focus:ring-offset-gray-950;
+  }
+
+  /* Primary button - mobile optimized */
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-semibold
+           rounded-full px-5 sm:px-6 py-2.5 transition-all duration-200
+           hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+           disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none
+           active:scale-95 touch-manipulation;
+  }
+
+  /* Outline button - mobile optimized */
+  .btn-outline {
+    @apply border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200
+           hover:border-primary-500 hover:text-primary-500 font-semibold
+           rounded-full px-5 sm:px-6 py-2.5 transition-all duration-200
+           hover:-translate-y-0.5 focus:outline-none focus:ring-2
+           focus:ring-primary-500 focus:ring-offset-2 bg-transparent
+           active:scale-95 touch-manipulation;
+  }
+
+  /* Card base */
+  .card {
+    @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl;
+  }
+
+  /* Form input - mobile optimized */
+  .form-input {
+    @apply w-full px-4 py-3 bg-gray-100 dark:bg-gray-800
+           border border-gray-200 dark:border-gray-700 rounded-xl
+           text-gray-900 dark:text-gray-100 placeholder-gray-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500
+           focus:border-transparent transition-all duration-200 text-base sm:text-sm;
+  }
+
+  .form-input.error {
+    @apply border-red-500 focus:ring-red-500 bg-red-50 dark:bg-red-950/20;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center justify-center
+           min-w-[18px] h-[18px] px-1
+           bg-primary-500 text-white text-[10px] font-bold rounded-full;
+  }
+
+  /* Status badges */
+  .status-delivered  { @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400; }
+  .status-processing { @apply bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400; }
+  .status-shipped    { @apply bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400; }
+  .status-pending    { @apply bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400; }
+  .status-cancelled  { @apply bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400; }
+
+  /* Mobile-friendly touch targets */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Safe area padding for notched phones */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+
+  /* Mobile horizontal scroll container */
+  .scroll-x-mobile {
+    @apply flex overflow-x-auto gap-3 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid hide-scrollbar;
+  }
+
+  /* Sticky mobile bottom bar */
+  .mobile-bottom-bar {
+    @apply fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 
+           border-t border-gray-200 dark:border-gray-800 
+           p-4 z-40 safe-bottom md:hidden;
+  }
+}
+
+/* Page transition */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Mobile-specific utilities */
+@media (max-width: 639px) {
+  /* Full-width buttons on mobile */
+  .btn-full-mobile {
+    @apply w-full justify-center;
+  }
+
+  /* Reduce padding on mobile */
+  .compact-mobile {
+    @apply px-3 py-2;
+  }
+
+  /* Stack elements vertically on mobile */
+  .stack-mobile {
+    @apply flex-col;
+  }
+}
