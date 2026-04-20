@@ -63,9 +63,9 @@
   .skeleton {
     background: linear-gradient(
       90deg,
-      theme('colors.gray.200') 0%,
-      theme('colors.gray.100') 50%,
-      theme('colors.gray.200') 100%
+      #e5e7eb 0%,
+      #f3f4f6 50%,
+      #e5e7eb 100%
     );
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
@@ -75,9 +75,9 @@
   .dark .skeleton {
     background: linear-gradient(
       90deg,
-      theme('colors.gray.800') 0%,
-      theme('colors.gray.700') 50%,
-      theme('colors.gray.800') 100%
+      #1f2937 0%,
+      #374151 50%,
+      #1f2937 100%
     );
     background-size: 200% 100%;
   }

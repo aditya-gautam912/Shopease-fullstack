@@ -22,7 +22,7 @@ const optionalAuthMiddleware = async (req, res, next) => {
       email:  decoded.email,
       role:   decoded.role,
     };
-  } catch (err) {
+  } catch {
     // Token is invalid, but we don't block — just proceed without req.user
   }
 

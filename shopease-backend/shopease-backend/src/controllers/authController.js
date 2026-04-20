@@ -134,7 +134,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       refreshToken,
       process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET + '_refresh'
     );
-  } catch (err) {
+  } catch {
     return res.status(401).json({
       success: false,
       message: 'Invalid or expired refresh token',

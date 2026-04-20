@@ -134,7 +134,7 @@ function AreaChart({ data, color, height = 180 }) {
       {data.map((d, i) => (
         <g key={d.date || i}>
           <circle cx={px(i)} cy={py(d.value)} r="4"
-            fill="white" stroke={color} strokeWidth="2" className="dark:[fill:theme(colors.gray.900)]" />
+            fill="white" stroke={color} strokeWidth="2" className="dark:fill-gray-900" />
           <text x={px(i)} y={H - pad.bottom + 14} textAnchor="middle"
             fontSize="9" fill="currentColor" fillOpacity="0.45">{d.label}</text>
         </g>
