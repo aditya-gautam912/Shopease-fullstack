@@ -1,16 +1,47 @@
-# ShopEase Monorepo
+# ShopEase Full Stack
 
-ShopEase is a full-stack e-commerce application with:
+ShopEase is a full-stack e-commerce application built as a two-app workspace:
 
-- `shopease-frontend/shopease-frontend`: React 18 + Vite + Redux Toolkit web app, plus a Capacitor Android wrapper.
-- `shopease-backend/shopease-backend`: Node.js + Express + MongoDB API.
+- `shopease-frontend/shopease-frontend`: React + Vite + Redux Toolkit web app with a Capacitor Android wrapper
+- `shopease-backend/shopease-backend`: Node.js + Express + MongoDB REST API
 
-This repository should be treated as a two-app workspace. The nested backend copy that previously lived inside the frontend tree is not part of the supported runtime layout.
+Live Demo: https://shopease-fullstack.vercel.app
 
-## Folder Layout
+## Features
+
+- User authentication and account flows
+- Product listing and product detail pages
+- Cart and wishlist management
+- Checkout and order handling
+- Order tracking and profile management
+- Admin dashboard for products, users, orders, and coupons
+- Newsletter, review, and coupon support
+- Razorpay payment integration
+
+## Tech Stack
+
+### Frontend
+
+- React 18
+- Vite
+- Redux Toolkit
+- React Router
+- Tailwind CSS
+- Capacitor
+
+### Backend
+
+- Node.js
+- Express
+- MongoDB with Mongoose
+- JWT authentication
+- Nodemailer
+- Razorpay
+
+## Project Structure
 
 ```text
-Full App/
+shopease-fullstack/
 ├── README.md
 ├── shopease-backend/
 │   └── shopease-backend/
@@ -18,13 +49,15 @@ Full App/
     └── shopease-frontend/
 ```
 
-## Prerequisites
+## Local Setup
+
+### Prerequisites
 
 - Node.js 18+
 - npm 9+
-- MongoDB 6+ running locally or a MongoDB Atlas connection string
+- MongoDB local instance or MongoDB Atlas connection string
 
-## Environment Variables
+### Environment Variables
 
 Backend file: `shopease-backend/shopease-backend/.env`
 
@@ -35,15 +68,11 @@ MONGO_URI=mongodb://localhost:27017/shopease
 JWT_SECRET=replace_with_a_long_random_secret
 JWT_REFRESH_SECRET=replace_with_a_different_long_random_secret
 CLIENT_URL=http://localhost:5173
-
-# Email
 EMAIL_HOST=smtp.example.com
 EMAIL_PORT=587
 EMAIL_USER=your_smtp_user
 EMAIL_PASS=your_smtp_password
 EMAIL_FROM=noreply@example.com
-
-# Razorpay
 RAZORPAY_KEY_ID=your_key_id
 RAZORPAY_KEY_SECRET=your_key_secret
 ```
@@ -54,35 +83,35 @@ Frontend file: `shopease-frontend/shopease-frontend/.env`
 VITE_API_BASE_URL=http://localhost:5000/api
 ```
 
-## Install
+### Install Dependencies
 
 Backend:
 
 ```powershell
-cd "C:\Users\ag950\Full App\shopease-backend\shopease-backend"
+cd .\shopease-backend\shopease-backend
 npm install
 ```
 
 Frontend:
 
 ```powershell
-cd "C:\Users\ag950\Full App\shopease-frontend\shopease-frontend"
+cd .\shopease-frontend\shopease-frontend
 npm install
 ```
 
-## Run Locally
+## Run the Project
 
-Start the backend first:
+Start the backend:
 
 ```powershell
-cd "C:\Users\ag950\Full App\shopease-backend\shopease-backend"
+cd .\shopease-backend\shopease-backend
 npm run dev
 ```
 
 Start the frontend in a second terminal:
 
 ```powershell
-cd "C:\Users\ag950\Full App\shopease-frontend\shopease-frontend"
+cd .\shopease-frontend\shopease-frontend
 npm run dev
 ```
 
@@ -92,38 +121,35 @@ Application URLs:
 - Backend API: `http://localhost:5000/api`
 - Health check: `http://localhost:5000/api/health`
 
-## Quality Checks
+## Available Scripts
 
 Frontend:
 
 ```powershell
-cd "C:\Users\ag950\Full App\shopease-frontend\shopease-frontend"
+npm run dev
+npm run build
 npm run lint
 npm run test
-npm run build
 ```
 
 Backend:
 
 ```powershell
-cd "C:\Users\ag950\Full App\shopease-backend\shopease-backend"
+npm run dev
+npm run start
 npm run lint
 npm run test
+npm run seed
+npm run seed:safe
 ```
 
-## Payments
+## Notes
 
-The supported Razorpay integration lives in:
+- Set `CLIENT_URL` to the deployed frontend origin in production
+- Set `VITE_API_BASE_URL` to the deployed backend API URL
+- Use strong, different values for `JWT_SECRET` and `JWT_REFRESH_SECRET`
+- Enable Razorpay only when the payment keys are configured
 
-- `shopease-backend/shopease-backend/src/controllers/orderController.js`
-- `shopease-backend/shopease-backend/src/routes/orderRoutes.js`
+## Purpose
 
-Order creation for Razorpay is exposed at `POST /api/orders/razorpay-order`. Do not reintroduce a separate payment controller unless it replaces the order-based flow everywhere.
-
-## Deployment Notes
-
-- Set `CLIENT_URL` to the deployed frontend origin.
-- Set `VITE_API_BASE_URL` to the deployed backend API URL.
-- Use strong, distinct values for `JWT_SECRET` and `JWT_REFRESH_SECRET`.
-- Enable Razorpay only when both payment keys are present.
-- MongoDB Atlas is recommended for cloud deployment.
+This project was built to strengthen full-stack development skills across frontend architecture, backend APIs, authentication, state management, and deployment workflows.
