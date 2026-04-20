@@ -1,6 +1,8 @@
 # ShopEase Full Stack
 
-ShopEase is a full-stack e-commerce application built as a two-app workspace:
+ShopEase is a full-stack e-commerce application built to simulate a modern online shopping platform with real user flows, admin operations, backend APIs, and payment-ready architecture.
+
+The project is organized as a two-app workspace:
 
 - `shopease-frontend/shopease-frontend`: React + Vite + Redux Toolkit web app with a Capacitor Android wrapper
 - `shopease-backend/shopease-backend`: Node.js + Express + MongoDB REST API
@@ -9,9 +11,16 @@ Live Demo: https://shopease-fullstack.vercel.app
 
 ## Overview
 
-This project was built to practice complete e-commerce workflows across frontend development, backend APIs, authentication, state management, payments, and deployment.
+This repository was built as a practical full-stack portfolio project rather than a static storefront clone. It covers the end-to-end development of an e-commerce system, including frontend state management, backend service design, authentication, order workflows, admin tools, and deployment-oriented configuration.
 
-It is designed as a practical portfolio project rather than a static UI clone. The repository includes both the client application and the supporting backend services needed for a functional shopping platform.
+The goal of ShopEase is to demonstrate how multiple pieces of a real product fit together in one codebase:
+
+- customer-facing shopping experience
+- admin-side management workflows
+- backend APIs and business logic
+- authentication and protected routes
+- payment-ready checkout flow
+- environment-aware deployment setup
 
 ## Features
 
