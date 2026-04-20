@@ -7,6 +7,12 @@ ShopEase is a full-stack e-commerce application built as a two-app workspace:
 
 Live Demo: https://shopease-fullstack.vercel.app
 
+## Overview
+
+This project was built to practice complete e-commerce workflows across frontend development, backend APIs, authentication, state management, payments, and deployment.
+
+It is designed as a practical portfolio project rather than a static UI clone. The repository includes both the client application and the supporting backend services needed for a functional shopping platform.
+
 ## Features
 
 - User authentication and account flows
@@ -17,6 +23,15 @@ Live Demo: https://shopease-fullstack.vercel.app
 - Admin dashboard for products, users, orders, and coupons
 - Newsletter, review, and coupon support
 - Razorpay payment integration
+
+## Key Highlights
+
+- Full-stack monorepo with separate frontend and backend applications
+- Real API integration between the React client and Express server
+- Admin area for managing store data
+- Payment workflow support with Razorpay
+- Email and order-related backend flows
+- Mobile-ready frontend wrapper with Capacitor
 
 ## Tech Stack
 
@@ -37,6 +52,14 @@ Live Demo: https://shopease-fullstack.vercel.app
 - JWT authentication
 - Nodemailer
 - Razorpay
+
+## What This Project Demonstrates
+
+- Building a complete React frontend with routing and state management
+- Designing REST APIs with Express and MongoDB
+- Managing authentication and protected routes
+- Connecting payments, user flows, and admin workflows in one system
+- Organizing a larger project across multiple apps and environments
 
 ## Project Structure
 
@@ -121,6 +144,25 @@ Application URLs:
 - Backend API: `http://localhost:5000/api`
 - Health check: `http://localhost:5000/api/health`
 
+## Core Modules
+
+Frontend modules include:
+
+- authentication
+- product browsing
+- cart and wishlist
+- checkout and orders
+- profile and order tracking
+- admin dashboard
+
+Backend modules include:
+
+- auth routes
+- product and review APIs
+- order and coupon APIs
+- newsletter support
+- admin management endpoints
+
 ## Available Scripts
 
 Frontend:
@@ -150,6 +192,6 @@ npm run seed:safe
 - Use strong, different values for `JWT_SECRET` and `JWT_REFRESH_SECRET`
 - Enable Razorpay only when the payment keys are configured
 
-## Purpose
+## Repository Purpose
 
-This project was built to strengthen full-stack development skills across frontend architecture, backend APIs, authentication, state management, and deployment workflows.
+This repository showcases practical full-stack development skills through a project that combines UI development, backend architecture, authentication, payments, and deployment-oriented setup.
