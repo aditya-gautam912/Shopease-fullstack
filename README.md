@@ -7,8 +7,6 @@ The project is organized as a two-app workspace:
 - `shopease-frontend/shopease-frontend`: React + Vite + Redux Toolkit web app with a Capacitor Android wrapper
 - `shopease-backend/shopease-backend`: Node.js + Express + MongoDB REST API
 
-Live Demo: https://shopease-fullstack.vercel.app
-
 ## Overview
 
 This repository was built as a practical full-stack portfolio project rather than a static storefront clone. It covers the end-to-end development of an e-commerce system, including frontend state management, backend service design, authentication, order workflows, admin tools, and deployment-oriented configuration.
