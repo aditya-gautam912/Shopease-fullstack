@@ -32,8 +32,8 @@ const {
   cookieName: IS_PRODUCTION ? '__Host-shopease.x-csrf-token' : 'shopease.x-csrf-token',
   cookieOptions: {
     httpOnly: true,
-    sameSite: IS_PRODUCTION ? 'strict' : 'lax',
-    secure: IS_PRODUCTION,
+    sameSite: 'none', // Required for cross-domain (frontend/backend on different Render subdomains)
+    secure: true,
     path: '/',
     maxAge: 60 * 60 * 1000, // 1 hour
   },
