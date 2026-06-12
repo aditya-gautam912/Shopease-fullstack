@@ -1,0 +1,76 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Deploys both backend (Node.js web service) and frontend (static site).
+
+services:
+  # ── Backend API ────────────────────────────────────────────
+  - type: web
+    name: shopease-api
+    runtime: node
+    repo: https://github.com/aditya-gautam912/Shopease-fullstack
+    rootDir: shopease-backend/shopease-backend
+    buildCommand: npm install
+    startCommand: bash startup.sh
+    healthCheckPath: /api/health
+    domains:
+      - shopease-api.onrender.com
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "5000"
+      - key: CLIENT_URL
+        value: https://shopease-store.onrender.com
+      - key: DATABASE_URL
+        fromDatabase:
+          name: shopease-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: "15m"
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: "7d"
+      - key: CSRF_SECRET
+        generateValue: true
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: FACEBOOK_APP_ID
+        sync: false
+      - key: FACEBOOK_APP_SECRET
+        sync: false
+
+  # ── Frontend Static Site ───────────────────────────────────
+  - type: static_site
+    name: shopease-store
+    repo: https://github.com/aditya-gautam912/Shopease-fullstack
+    rootDir: shopease-frontend/shopease-frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    domains:
+      - shopease-store.onrender.com
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://shopease-api.onrender.com/api
+
+# ── PostgreSQL Database ─────────────────────────────────────
+databases:
+  - name: shopease-db
+    databaseName: shopease
+    plan: free
+    ipAllowList: []
