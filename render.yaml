@@ -1,8 +1,8 @@
 # Render Blueprint — https://render.com/docs/blueprint-spec
-# Deploys both backend (Node.js web service) and frontend (static site).
+# Defines the backend API service. Frontend and database are
+# created separately via the Render dashboard (2 clicks each).
 
 services:
-  # ── Backend API ────────────────────────────────────────────
   - type: web
     name: shopease-api
     runtime: node
@@ -11,8 +11,6 @@ services:
     buildCommand: npm install
     startCommand: bash startup.sh
     healthCheckPath: /api/health
-    domains:
-      - shopease-api.onrender.com
     envVars:
       - key: NODE_ENV
         value: production
@@ -55,20 +53,6 @@ services:
       - key: FACEBOOK_APP_SECRET
         sync: false
 
-  # ── Frontend Static Site ───────────────────────────────────
-  - type: static_site
-    name: shopease-store
-    repo: https://github.com/aditya-gautam912/Shopease-fullstack
-    rootDir: shopease-frontend/shopease-frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
-    domains:
-      - shopease-store.onrender.com
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: https://shopease-api.onrender.com/api
-
-# ── PostgreSQL Database ─────────────────────────────────────
 databases:
   - name: shopease-db
     databaseName: shopease
