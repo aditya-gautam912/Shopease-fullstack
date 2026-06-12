@@ -1,9 +1,7 @@
 const { ValidationError, UniqueConstraintError, ForeignKeyConstraintError, DatabaseError, ConnectionError } = require('sequelize');
 
 const errorHandler = (err, req, res, _next) => {
-  if (process.env.NODE_ENV === 'development') {
-    console.error('❌ Error:', err);
-  }
+  console.error('❌ Error:', err);
 
   let statusCode = err.statusCode || 500;
   let message = err.message || 'Internal Server Error';
@@ -37,7 +35,6 @@ const errorHandler = (err, req, res, _next) => {
   res.status(statusCode).json({
     success: false,
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
   });
 };
 
