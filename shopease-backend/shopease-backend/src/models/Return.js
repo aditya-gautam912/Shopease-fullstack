@@ -1,94 +1,60 @@
-/**
- * src/models/Return.js
- * Mongoose schema and model for product returns and refunds.
- */
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const mongoose = require('mongoose');
-
-const returnItemSchema = new mongoose.Schema({
-  productId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true,
+const Return = sequelize.define('Return', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
   },
-  qty: {
-    type: Number,
-    required: true,
-    min: 1,
-  },
-  reason: {
-    type: String,
-    enum: ['defective', 'wrong-item', 'not-satisfied', 'other'],
-    required: true,
-  },
-}, { _id: false });
-
-const returnSchema = new mongoose.Schema({
   orderId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Order',
-    required: true,
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: { model: 'orders', key: 'id' },
+    field: 'order_id',
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: { model: 'users', key: 'id' },
+    field: 'user_id',
   },
   items: {
-    type: [returnItemSchema],
-    required: true,
-    validate: {
-      validator: (arr) => arr.length > 0,
-      message: 'A return must have at least one item',
-    },
+    type: DataTypes.JSONB,
+    allowNull: false,
   },
   reason: {
-    type: String,
-    enum: ['defective', 'wrong-item', 'not-satisfied', 'other'],
-    required: true,
+    type: DataTypes.ENUM('defective', 'wrong-item', 'not-satisfied', 'other'),
+    allowNull: false,
   },
   description: {
-    type: String,
-    required: true,
-    maxlength: 1000,
+    type: DataTypes.TEXT,
+    allowNull: false,
   },
   images: {
-    type: [String],
-    default: [],
-    validate: {
-      validator: (arr) => arr.length <= 5,
-      message: 'Maximum of 5 images allowed',
-    },
+    type: DataTypes.JSONB,
+    defaultValue: [],
   },
   status: {
-    type: String,
-    enum: ['requested', 'approved', 'rejected', 'refunded'],
-    default: 'requested',
+    type: DataTypes.ENUM('requested', 'approved', 'rejected', 'refunded'),
+    defaultValue: 'requested',
   },
   refundAmount: {
-    type: Number,
-    default: 0,
-    min: 0,
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+    field: 'refund_amount',
+    validate: { min: 0 },
   },
-  refundMethod: {
-    type: String,
-    default: null,
-  },
-  razorpayRefundId: {
-    type: String,
-    default: null,
-  },
-  adminNotes: {
-    type: String,
-    default: '',
-  },
+  refundMethod: { type: DataTypes.STRING(50), field: 'refund_method' },
+  razorpayRefundId: { type: DataTypes.STRING(255), field: 'razorpay_refund_id' },
+  adminNotes: { type: DataTypes.TEXT, field: 'admin_notes', defaultValue: '' },
 }, {
-  timestamps: true,
+  tableName: 'returns',
+  indexes: [
+    { fields: ['user_id', 'created_at'] },
+    { fields: ['status'] },
+    { fields: ['order_id'] },
+  ],
 });
 
-// ── Indexes for common query patterns ──────────────────────
-returnSchema.index({ userId: 1, createdAt: -1 });
-returnSchema.index({ status: 1 });
-returnSchema.index({ orderId: 1 });
-
-module.exports = mongoose.model('Return', returnSchema);
+module.exports = Return;

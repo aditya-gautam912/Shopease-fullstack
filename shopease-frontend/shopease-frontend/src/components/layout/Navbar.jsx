@@ -66,7 +66,7 @@ export default function Navbar() {
 
   const handleSearchSelect = (product) => {
     setSearch(''); setShowSug(false);
-    navigate(`/products/${product._id}`);
+    navigate(`/products/${product.id || product._id}`);
   };
 
   const handleSearchSubmit = (e) => {

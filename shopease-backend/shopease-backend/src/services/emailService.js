@@ -69,7 +69,7 @@ const sendOrderConfirmation = async (order, user) => {
   const itemsList = order.items
     .map(
       (item) =>
-        `<li>${item.product.title} x ${item.qty} - ₹${(item.price * item.qty).toFixed(2)}</li>`
+        `<li>${item.product.title} x ${item.qty} - ₹${(item.price * item.qty).toFixed(2)}</li>`,
     )
     .join('');
 
@@ -198,7 +198,7 @@ const sendPaymentReceipt = async (order, user, paymentDetails) => {
   const itemsList = order.items
     .map(
       (item) =>
-        `<li>${item.product.title} x ${item.qty} - ₹${(item.price * item.qty).toFixed(2)}</li>`
+        `<li>${item.product.title} x ${item.qty} - ₹${(item.price * item.qty).toFixed(2)}</li>`,
     )
     .join('');
 

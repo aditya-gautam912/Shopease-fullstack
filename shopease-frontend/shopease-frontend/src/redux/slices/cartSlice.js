@@ -6,6 +6,8 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 
+const id = (x) => x.id || x._id;
+
 // ── Hydrate cart from localStorage ────────────────────────
 const storedItems = (() => {
   try { return JSON.parse(localStorage.getItem('se_cart')) || []; }
@@ -24,13 +26,13 @@ const cartSlice = createSlice({
     addToCart(state, action) {
       const product  = action.payload;
       const qty      = product.qty || 1;
-      const existing = state.items.find((i) => i._id === product._id);
+      const existing = state.items.find((i) => id(i) === id(product));
 
       if (existing) {
         existing.qty = Math.min(existing.qty + qty, product.stock || 99);
       } else {
         state.items.push({
-          _id:      product._id,
+          _id:      id(product),
           title:    product.title,
           price:    product.price,
           image:    product.image,
@@ -43,13 +45,13 @@ const cartSlice = createSlice({
 
     // Remove a specific product from cart
     removeFromCart(state, action) {
-      state.items = state.items.filter((i) => i._id !== action.payload);
+      state.items = state.items.filter((i) => id(i) !== action.payload);
     },
 
     // Set an exact quantity for a cart item
     updateQty(state, action) {
-      const { id, qty } = action.payload;
-      const item = state.items.find((i) => i._id === id);
+      const { id: itemId, qty } = action.payload;
+      const item = state.items.find((i) => id(i) === itemId);
       if (item) {
         item.qty = Math.max(1, Math.min(qty, item.stock || 99));
       }

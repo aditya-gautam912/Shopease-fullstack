@@ -1,56 +1,50 @@
-/**
- * src/models/Banner.js
- * Mongoose schema and model for promotional banners.
- * Supports scheduled activation, positioning, and image display.
- */
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const mongoose = require('mongoose');
-
-const bannerSchema = new mongoose.Schema({
+const Banner = sequelize.define('Banner', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
   title: {
-    type: String,
-    required: [true, 'Banner title is required'],
-    trim: true,
+    type: DataTypes.STRING(255),
+    allowNull: false,
   },
   description: {
-    type: String,
-    trim: true,
-    default: '',
+    type: DataTypes.TEXT,
+    defaultValue: '',
   },
   image: {
-    type: String,
-    required: [true, 'Banner image URL is required'],
+    type: DataTypes.STRING(500),
+    allowNull: false,
   },
   link: {
-    type: String,
-    trim: true,
-    default: '',
+    type: DataTypes.STRING(500),
+    defaultValue: '',
   },
   active: {
-    type: Boolean,
-    default: true,
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
   },
   startDate: {
-    type: Date,
-    default: Date.now,
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    field: 'start_date',
   },
   endDate: {
-    type: Date,
-    default: null,
+    type: DataTypes.DATE,
+    field: 'end_date',
   },
   position: {
-    type: String,
-    enum: {
-      values: ['hero', 'top-bar', 'sidebar', 'category'],
-      message: '{VALUE} is not a valid position',
-    },
-    default: 'hero',
+    type: DataTypes.ENUM('hero', 'top-bar', 'sidebar', 'category'),
+    defaultValue: 'hero',
   },
 }, {
-  timestamps: true,
+  tableName: 'banners',
+  indexes: [
+    { fields: ['active', 'start_date', 'end_date'] },
+  ],
 });
 
-// Index for efficient queries on active banners
-bannerSchema.index({ active: 1, startDate: 1, endDate: 1 });
-
-module.exports = mongoose.model('Banner', bannerSchema);
+module.exports = Banner;

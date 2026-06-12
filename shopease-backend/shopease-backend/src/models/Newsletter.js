@@ -1,39 +1,36 @@
-/**
- * src/models/Newsletter.js
- * Newsletter subscription model
- */
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
+const crypto = require('crypto');
 
-const mongoose = require('mongoose');
-
-const newsletterSchema = new mongoose.Schema(
-  {
-    email: {
-      type: String,
-      required: [true, 'Email is required'],
-      unique: true,
-      lowercase: true,
-      trim: true,
-      match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
-    },
-    active: {
-      type: Boolean,
-      default: true,
-    },
-    unsubscribeToken: {
-      type: String,
-      unique: true,
-      sparse: true,
-    },
-    subscribedAt: {
-      type: Date,
-      default: Date.now,
-    },
+const Newsletter = sequelize.define('Newsletter', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
   },
-  {
-    timestamps: true,
-  }
-);
+  email: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    unique: true,
+    validate: { isEmail: { msg: 'Please provide a valid email' } },
+  },
+  active: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
+  unsubscribeToken: {
+    type: DataTypes.STRING(255),
+    unique: true,
+    field: 'unsubscribe_token',
+    defaultValue: () => crypto.randomBytes(32).toString('hex'),
+  },
+  subscribedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    field: 'subscribed_at',
+  },
+}, {
+  tableName: 'newsletters',
+});
 
-// Note: 'unique: true' on 'email' already creates an index
-
-module.exports = mongoose.model('Newsletter', newsletterSchema);
+module.exports = Newsletter;

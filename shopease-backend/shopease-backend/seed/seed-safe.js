@@ -1,80 +1,55 @@
-/**
- * Safe production seed.
- *
- * This script does not delete users, orders, products, or coupons.
- * It only inserts sample products when the products collection is empty,
- * creates the admin user if missing, and upserts default coupons.
- */
-
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const path = require('path');
-const dns = require('dns');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
-const User = require('../src/models/User');
-const Product = require('../src/models/Product');
-const Coupon = require('../src/models/Coupon');
-const { COUPONS, PRODUCTS, USERS } = require('./seed');
-
-if (process.env.DNS_SERVERS) {
-  dns.setServers(process.env.DNS_SERVERS.split(',').map((server) => server.trim()).filter(Boolean));
-}
+const { sequelize } = require('../src/config/db');
+const { User, Product, Coupon } = require('../src/models');
+const { USERS, PRODUCTS, COUPONS } = require('./seed-data');
 
 const seedSafe = async () => {
   try {
-    if (!process.env.MONGO_URI) {
-      throw new Error('MONGO_URI is not set');
-    }
+    await sequelize.authenticate();
+    console.log('\n🔗  Connected to PostgreSQL');
 
-    await mongoose.connect(process.env.MONGO_URI);
-    console.log('\nConnected to MongoDB');
-
-    const adminSeed = USERS.find((user) => user.role === 'admin');
-    const existingAdmin = await User.findOne({ email: adminSeed.email });
-
-    if (existingAdmin) {
-      console.log('Admin user already exists; skipping admin creation');
+    // Only create admin if missing
+    const adminCount = await User.count();
+    if (adminCount === 0) {
+      console.log('👤  Creating admin user...');
+      await User.bulkCreate(USERS, { individualHooks: true });
+      console.log('✅  Admin user created');
     } else {
-      await User.create(adminSeed);
-      console.log('Created admin user');
+      console.log('⏭️  Users table not empty — skipping');
     }
 
-    const activeProductCount = await Product.countDocuments({ isActive: true });
-
-    if (activeProductCount > 0) {
-      console.log(`Active products already exist (${activeProductCount}); skipping product seed`);
+    // Only insert products if table is empty
+    const productCount = await Product.count();
+    if (productCount === 0) {
+      console.log('📦  Seeding products...');
+      const productRecords = PRODUCTS.map(p => ({
+        title: p.title, description: p.description, price: p.price / 100,
+        oldPrice: p.oldPrice ? p.oldPrice / 100 : null, category: p.category,
+        image: p.image, images: p.images || [p.image],
+        ratingRate: p.rating?.rate || 0, ratingCount: p.rating?.count || 0,
+        stock: p.stock || 100, isActive: true,
+      }));
+      await Product.bulkCreate(productRecords);
+      console.log(`✅  Created ${productRecords.length} products`);
     } else {
-      const createdProducts = await Product.create(PRODUCTS);
-      console.log(`Created ${createdProducts.length} products`);
+      console.log('⏭️  Products table not empty — skipping');
     }
 
+    // Upsert default coupons
+    console.log('🎟️  Upserting coupons...');
     for (const coupon of COUPONS) {
-      await Coupon.updateOne(
-        { code: coupon.code },
-        { $set: coupon },
-        { upsert: true, runValidators: true },
-      );
+      await Coupon.findOrCreate({ where: { code: coupon.code }, defaults: coupon });
     }
+    console.log('✅  Coupons synced');
 
-    const finalProductCount = await Product.countDocuments();
-    const couponCount = await Coupon.countDocuments({
-      code: { $in: COUPONS.map((coupon) => coupon.code) },
-    });
-
-    console.log('\nSafe seed complete');
-    console.log(`Products in database: ${finalProductCount}`);
-    console.log(`Default coupons available: ${couponCount}`);
+    console.log('\n🎉  Seed completed successfully');
   } catch (error) {
-    console.error('\nSafe seed failed:', error.message);
-    if (error.errors) {
-      Object.values(error.errors).forEach((e) => console.error('  ->', e.message));
-    }
-    process.exitCode = 1;
+    console.error('\n❌  Seed failed:', error.message);
   } finally {
-    await mongoose.disconnect();
-    console.log('Disconnected from MongoDB');
+    await sequelize.close();
+    process.exit(0);
   }
 };
 

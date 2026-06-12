@@ -1,7 +1,7 @@
 /**
  * src/middleware/rateLimiter.js
  * Rate limiting middleware to protect against brute force and DDoS attacks.
- * 
+ *
  * Different limits for different route types:
  * - Auth routes (login, register): Stricter limits
  * - API routes: Standard limits

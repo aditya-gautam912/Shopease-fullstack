@@ -8,7 +8,6 @@
  *  - Recursive sanitization of nested objects/arrays
  */
 
-const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss');
 
 // ── XSS Options ────────────────────────────────────────────
@@ -45,6 +44,50 @@ const sanitizeXSS = (data) => {
 };
 
 /**
+ * Recursively removes MongoDB operator characters from object keys.
+ * Express 5 exposes req.query through a getter, so we sanitize values
+ * and then mutate the existing object instead of reassigning req.query.
+ * @param {any} data - Input data to sanitize
+ * @param {string} context - Request section for logging
+ * @returns {any} - Sanitized data
+ */
+const sanitizeNoSqlKeys = (data, context = 'payload') => {
+  if (Array.isArray(data)) {
+    return data.map((item) => sanitizeNoSqlKeys(item, context));
+  }
+
+  if (data && typeof data === 'object') {
+    const sanitized = {};
+    for (const [rawKey, value] of Object.entries(data)) {
+      const safeKey = rawKey.replace(/\$/g, '_').replace(/\./g, '_');
+      if (safeKey !== rawKey) {
+        console.warn(`[Security] Sanitized NoSQL injection attempt in ${context}.${rawKey}`);
+      }
+      sanitized[safeKey] = sanitizeNoSqlKeys(value, context);
+    }
+    return sanitized;
+  }
+
+  return data;
+};
+
+/**
+ * Mutates an existing request section in place so Express 5 getter-backed
+ * objects such as req.query remain writable for downstream middleware.
+ * @param {object} target - Existing request object section
+ * @param {any} sanitizedValue - Sanitized replacement value
+ */
+const applySanitizedValue = (target, sanitizedValue) => {
+  for (const key of Object.keys(target)) {
+    delete target[key];
+  }
+
+  if (sanitizedValue && typeof sanitizedValue === 'object' && !Array.isArray(sanitizedValue)) {
+    Object.assign(target, sanitizedValue);
+  }
+};
+
+/**
  * XSS sanitization middleware.
  * Sanitizes req.body, req.query, and req.params.
  */
@@ -53,25 +96,30 @@ const xssSanitize = (req, res, next) => {
     req.body = sanitizeXSS(req.body);
   }
   if (req.query) {
-    req.query = sanitizeXSS(req.query);
+    applySanitizedValue(req.query, sanitizeXSS(req.query));
   }
   if (req.params) {
-    req.params = sanitizeXSS(req.params);
+    applySanitizedValue(req.params, sanitizeXSS(req.params));
   }
   next();
 };
 
 /**
  * NoSQL injection sanitization middleware.
- * Uses express-mongo-sanitize to remove $ and . from keys.
+ * Removes $ and . from keys without reassigning getter-backed request objects.
  */
-const noSqlSanitize = mongoSanitize({
-  replaceWith: '_',        // Replace prohibited chars with underscore
-  allowDots: false,        // Don't allow dots in keys
-  onSanitize: ({ key }) => {
-    console.warn(`[Security] Sanitized NoSQL injection attempt in ${key}`);
-  },
-});
+const noSqlSanitize = (req, res, next) => {
+  if (req.body) {
+    req.body = sanitizeNoSqlKeys(req.body, 'body');
+  }
+  if (req.query) {
+    applySanitizedValue(req.query, sanitizeNoSqlKeys(req.query, 'query'));
+  }
+  if (req.params) {
+    applySanitizedValue(req.params, sanitizeNoSqlKeys(req.params, 'params'));
+  }
+  next();
+};
 
 /**
  * Combined sanitization middleware.
@@ -84,4 +132,5 @@ module.exports = {
   noSqlSanitize,
   xssSanitize,
   sanitizeXSS,
+  sanitizeNoSqlKeys,
 };

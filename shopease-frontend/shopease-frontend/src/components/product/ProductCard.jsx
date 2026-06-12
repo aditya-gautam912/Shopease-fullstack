@@ -15,15 +15,17 @@ import { selectIsLoggedIn } from '../../redux/slices/authSlice';
 import { userService } from '../../services/index';
 import { fmtPrice, fakeDiscount, ratingStars } from '../../utils/helpers';
 
+const id = (p) => p._id || p.id;
+
 const FALLBACK = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=60';
 
 export default function ProductCard({ product, wishlistIds = [], onWishlistToggle }) {
   const dispatch    = useDispatch();
   const isLoggedIn  = useSelector(selectIsLoggedIn);
-  const [wishlisted, setWishlisted] = useState(wishlistIds.includes(product._id));
+  const [wishlisted, setWishlisted] = useState(wishlistIds.includes(id(product)));
   const [wishLoading, setWishLoading] = useState(false);
 
-  const disc     = fakeDiscount(product._id);
+  const disc     = fakeDiscount(id(product));
   const oldPrice = product.oldPrice || parseFloat((product.price / (1 - disc / 100)).toFixed(2));
 
   const handleAddToCart = (e) => {
@@ -39,9 +41,9 @@ export default function ProductCard({ product, wishlistIds = [], onWishlistToggl
     if (!isLoggedIn) { toast.error('Sign in to save wishlist'); return; }
     setWishLoading(true);
     try {
-      await userService.toggleWishlist(product._id);
+      await userService.toggleWishlist(id(product));
       setWishlisted((w) => !w);
-      if (onWishlistToggle) onWishlistToggle(product._id);
+      if (onWishlistToggle) onWishlistToggle(id(product));
       toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist ♡');
     } catch {
       toast.error('Could not update wishlist');
@@ -57,7 +59,7 @@ export default function ProductCard({ product, wishlistIds = [], onWishlistToggl
       transition={{ duration: 0.2 }}
       className="card overflow-hidden group cursor-pointer hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg transition-all duration-300 touch-manipulation"
     >
-      <Link to={`/products/${product._id}`} className="block">
+      <Link to={`/products/${id(product)}`} className="block">
         {/* Image */}
         <div className="relative aspect-square bg-gray-100 dark:bg-gray-800 overflow-hidden">
           <img
@@ -97,8 +99,8 @@ export default function ProductCard({ product, wishlistIds = [], onWishlistToggl
 
           {/* Rating */}
           <div className="flex items-center gap-1 sm:gap-1.5 mb-2 sm:mb-3">
-            <span className="text-yellow-400 text-[10px] sm:text-xs">{ratingStars(product.rating?.rate)}</span>
-            <span className="text-[10px] sm:text-xs text-gray-400">({product.rating?.count ?? 0})</span>
+            <span className="text-yellow-400 text-[10px] sm:text-xs">{ratingStars(product.ratingRate)}</span>
+            <span className="text-[10px] sm:text-xs text-gray-400">({product.ratingCount ?? 0})</span>
           </div>
 
           {/* Price row */}

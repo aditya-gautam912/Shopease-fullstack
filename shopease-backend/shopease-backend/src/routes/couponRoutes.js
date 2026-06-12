@@ -22,10 +22,9 @@ const validate        = require('../middleware/validate');
 
 const router = express.Router();
 
-// ── POST /api/coupons/validate  (auth users) ─────────────
+// ── POST /api/coupons/validate  (public) ──────────────────
 router.post(
   '/validate',
-  authMiddleware,
   [
     body('code')
       .trim()
@@ -38,7 +37,7 @@ router.post(
       .isFloat({ min: 0.01, max: 10000000 }).withMessage('Valid subtotal is required'),
   ],
   validate,
-  validateCouponCode
+  validateCouponCode,
 );
 
 // ── Admin coupon validation ────────────────────────────────
@@ -87,11 +86,11 @@ router.put(
   adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid coupon ID'),
+      .isUUID().withMessage('Invalid coupon ID'),
     ...couponValidation.map(v => v.optional()),
   ],
   validate,
-  updateCoupon
+  updateCoupon,
 );
 
 // ── DELETE /api/coupons/:id  (admin) ──────────────────────
@@ -101,10 +100,10 @@ router.delete(
   adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid coupon ID'),
+      .isUUID().withMessage('Invalid coupon ID'),
   ],
   validate,
-  deleteCoupon
+  deleteCoupon,
 );
 
 // ── PATCH /api/coupons/:id/toggle  (admin) ────────────────
@@ -114,10 +113,10 @@ router.patch(
   adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid coupon ID'),
+      .isUUID().withMessage('Invalid coupon ID'),
   ],
   validate,
-  toggleCoupon
+  toggleCoupon,
 );
 
 module.exports = router;

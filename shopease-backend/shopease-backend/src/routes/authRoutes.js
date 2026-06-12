@@ -8,23 +8,23 @@
 const express  = require('express');
 const { body } = require('express-validator');
 
-const { 
-  register, 
-  login, 
-  refreshAccessToken, 
-  logoutUser, 
+const {
+  register,
+  login,
+  refreshAccessToken,
+  logoutUser,
   logoutAllDevices,
-  forgotPassword, 
+  forgotPassword,
   resetPassword,
   verifyEmail,
   resendVerification,
 } = require('../controllers/authController');
 const validate            = require('../middleware/validate');
 const authMiddleware      = require('../middleware/authMiddleware');
-const { 
-  authLimiter, 
-  registrationLimiter, 
-  passwordResetLimiter 
+const {
+  authLimiter,
+  registrationLimiter,
+  passwordResetLimiter,
 } = require('../middleware/rateLimiter');
 
 const router = express.Router();
@@ -53,7 +53,7 @@ router.post(
       .isLength({ min: 6, max: 128 }).withMessage('Password must be 6-128 characters'),
   ],
   validate,
-  register
+  register,
 );
 
 // ── POST /api/auth/login ───────────────────────────────────
@@ -72,7 +72,7 @@ router.post(
       .notEmpty().withMessage('Password is required'),
   ],
   validate,
-  login
+  login,
 );
 
 // ── POST /api/auth/refresh ─────────────────────────────────
@@ -84,7 +84,7 @@ router.post(
       .isJWT().withMessage('Invalid token format'),
   ],
   validate,
-  refreshAccessToken
+  refreshAccessToken,
 );
 
 // ── POST /api/auth/logout ──────────────────────────────────
@@ -106,7 +106,7 @@ router.post(
       .normalizeEmail(),
   ],
   validate,
-  forgotPassword
+  forgotPassword,
 );
 
 // ── POST /api/auth/reset-password/:token ──────────────────
@@ -120,7 +120,7 @@ router.post(
       .isLength({ min: 6, max: 128 }).withMessage('Password must be 6-128 characters'),
   ],
   validate,
-  resetPassword
+  resetPassword,
 );
 
 // ── GET /api/auth/verify-email/:token ─────────────────────

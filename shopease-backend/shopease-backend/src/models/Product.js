@@ -1,105 +1,72 @@
-/**
- * src/models/Product.js
- * Mongoose schema and model for e-commerce products.
- * Supports categories, ratings, stock tracking, and soft activation.
- */
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const mongoose = require('mongoose');
-
-const variantSchema = new mongoose.Schema({
-  sku: {
-    type: String,
-    required: [true, 'Variant SKU is required'],
-    trim: true,
+const Product = sequelize.define('Product', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
   },
-  size: {
-    type: String,
-    default: '',
-    trim: true,
-  },
-  color: {
-    type: String,
-    default: '',
-    trim: true,
-  },
-  price: {
-    type: Number,
-    required: [true, 'Variant price is required'],
-    min: [0, 'Price cannot be negative'],
-  },
-  stock: {
-    type: Number,
-    required: [true, 'Variant stock is required'],
-    min: [0, 'Stock cannot be negative'],
-  },
-  image: {
-    type: String,
-    default: '',
-  },
-}, { _id: true });
-
-const productSchema = new mongoose.Schema({
   title: {
-    type: String,
-    required: [true, 'Product title is required'],
-    trim: true,
+    type: DataTypes.STRING(255),
+    allowNull: false,
+    validate: { notEmpty: { msg: 'Product title is required' } },
   },
   description: {
-    type: String,
-    required: [true, 'Product description is required'],
-    trim: true,
+    type: DataTypes.TEXT,
+    allowNull: false,
   },
   price: {
-    type: Number,
-    required: [true, 'Price is required'],
-    min: [0, 'Price cannot be negative'],
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    validate: { min: { args: [0], msg: 'Price cannot be negative' } },
   },
   oldPrice: {
-    type: Number,
-    default: null,
-    min: [0, 'Old price cannot be negative'],
+    type: DataTypes.DECIMAL(10, 2),
+    validate: { min: { args: [0], msg: 'Old price cannot be negative' } },
   },
   category: {
-    type: String,
-    required: [true, 'Category is required'],
-    enum: {
-      values: ['electronics', 'fashion', 'home', 'sports', 'beauty'],
-      message: '{VALUE} is not a valid category',
-    },
-    lowercase: true,
+    type: DataTypes.ENUM('electronics', 'fashion', 'home', 'sports', 'beauty'),
+    allowNull: false,
   },
   image: {
-    type: String,
-    required: [true, 'Product image URL is required'],
+    type: DataTypes.STRING(500),
+    allowNull: false,
   },
   images: {
-    type: [String],
-    default: [],
+    type: DataTypes.JSONB,
+    defaultValue: [],
   },
-  rating: {
-    rate:  { type: Number, default: 0, min: 0, max: 5 },
-    count: { type: Number, default: 0, min: 0 },
+  ratingRate: {
+    type: DataTypes.DECIMAL(2, 1),
+    defaultValue: 0,
+    field: 'rating_rate',
+    validate: { min: 0, max: 5 },
+  },
+  ratingCount: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    field: 'rating_count',
+    validate: { min: 0 },
   },
   stock: {
-    type: Number,
-    default: 100,
-    min: [0, 'Stock cannot be negative'],
-  },
-  variants: {
-    type: [variantSchema],
-    default: [],
+    type: DataTypes.INTEGER,
+    defaultValue: 100,
+    validate: { min: { args: [0], msg: 'Stock cannot be negative' } },
   },
   isActive: {
-    type: Boolean,
-    default: true,
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+    field: 'is_active',
   },
 }, {
-  timestamps: true,
+  tableName: 'products',
+  indexes: [
+    { fields: ['category'] },
+    { fields: ['price'] },
+    { fields: ['is_active'] },
+    { fields: ['is_active', 'category', 'price'] },
+  ],
 });
 
-// ── Index for fast text search ─────────────────────────────
-productSchema.index({ title: 'text', description: 'text' });
-productSchema.index({ category: 1 });
-productSchema.index({ price: 1 });
-
-module.exports = mongoose.model('Product', productSchema);
+module.exports = Product;

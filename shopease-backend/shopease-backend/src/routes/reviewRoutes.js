@@ -52,7 +52,7 @@ productReviewRouter.post(
       .escape(),
   ],
   validate,
-  createReview
+  createReview,
 );
 
 productReviewRouter.put(
@@ -60,7 +60,7 @@ productReviewRouter.put(
   authMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid review ID'),
+      .isUUID().withMessage('Invalid review ID'),
     body('rating')
       .optional()
       .isInt({ min: 1, max: 5 })
@@ -78,7 +78,7 @@ productReviewRouter.put(
       .escape(),
   ],
   validate,
-  updateReview
+  updateReview,
 );
 
 productReviewRouter.delete(
@@ -86,10 +86,10 @@ productReviewRouter.delete(
   authMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid review ID'),
+      .isUUID().withMessage('Invalid review ID'),
   ],
   validate,
-  deleteReview
+  deleteReview,
 );
 
 // ── Standalone router ──────────────────────────────────────
@@ -105,10 +105,10 @@ standaloneRouter.put(
   adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid review ID'),
+      .isUUID().withMessage('Invalid review ID'),
   ],
   validate,
-  toggleVisibility
+  toggleVisibility,
 );
 
 module.exports = { productReviewRouter, standaloneRouter };

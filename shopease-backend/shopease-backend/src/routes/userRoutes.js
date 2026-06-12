@@ -60,7 +60,7 @@ router.put(
       .matches(/^[+\d\s()-]*$/).withMessage('Invalid phone format'),
   ],
   validate,
-  updateMe
+  updateMe,
 );
 
 // ── PUT /api/users/me/password  (auth – change password) ──
@@ -85,7 +85,7 @@ router.put(
       }),
   ],
   validate,
-  changePassword
+  changePassword,
 );
 
 // ── Addresses ─────────────────────────────────────────────
@@ -127,27 +127,27 @@ router.post(
       .isBoolean().withMessage('isDefault must be a boolean'),
   ],
   validate,
-  addAddress
+  addAddress,
 );
 
 router.delete(
   '/me/address/:addressId',
   [
     param('addressId')
-      .isMongoId().withMessage('Invalid address ID'),
+      .isUUID().withMessage('Invalid address ID'),
   ],
   validate,
-  removeAddress
+  removeAddress,
 );
 
 router.patch(
   '/me/address/:addressId/default',
   [
     param('addressId')
-      .isMongoId().withMessage('Invalid address ID'),
+      .isUUID().withMessage('Invalid address ID'),
   ],
   validate,
-  setDefaultAddress
+  setDefaultAddress,
 );
 
 // ── Wishlist ──────────────────────────────────────────────
@@ -157,10 +157,10 @@ router.post(
   '/wishlist/:productId',
   [
     param('productId')
-      .isMongoId().withMessage('Invalid product ID'),
+      .isUUID().withMessage('Invalid product ID'),
   ],
   validate,
-  toggleWishlist
+  toggleWishlist,
 );
 
 // ── Cart ──────────────────────────────────────────────────
@@ -172,15 +172,14 @@ router.put(
     body('items')
       .isArray().withMessage('Items must be an array'),
 
-    // ✅ FIX #6/#12 – changed productId → _id to match frontend cart item shape
     body('items.*._id')
-      .isMongoId().withMessage('Invalid product ID'),
+      .isUUID().withMessage('Invalid product ID'),
 
     body('items.*.qty')
       .isInt({ min: 1, max: 100 }).withMessage('Quantity must be between 1 and 100'),
   ],
   validate,
-  syncCart
+  syncCart,
 );
 
 // ── Recently Viewed ───────────────────────────────────────
@@ -210,7 +209,7 @@ router.get(
       .escape(),
   ],
   validate,
-  getAllUsers
+  getAllUsers,
 );
 
 // ── DELETE /api/users/:id  (admin only) ───────────────────
@@ -221,10 +220,10 @@ router.delete(
   adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid user ID'),
+      .isUUID().withMessage('Invalid user ID'),
   ],
   validate,
-  deleteUser
+  deleteUser,
 );
 
 // ── PATCH /api/users/:id/role  (admin only) ───────────────
@@ -235,7 +234,7 @@ router.patch(
   adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid user ID'),
+      .isUUID().withMessage('Invalid user ID'),
 
     body('role')
       .trim()
@@ -243,7 +242,7 @@ router.patch(
       .isIn(['admin', 'user']).withMessage("Role must be 'admin' or 'user'"),
   ],
   validate,
-  updateUserRole
+  updateUserRole,
 );
 
 module.exports = router;

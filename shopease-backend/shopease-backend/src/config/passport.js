@@ -24,7 +24,7 @@ module.exports = (passport) => {
           const name = profile.displayName;
 
           // Find user by email
-          let user = await User.findOne({ email });
+          let user = await User.findOne({ where: { email } });
 
           if (user) {
             // User exists, link Google account if not already linked
@@ -44,17 +44,17 @@ module.exports = (passport) => {
 
           // Generate JWT token
           const token = jwt.sign(
-            { id: user._id, email: user.email, role: user.role },
+            { id: user.id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRE || '7d' }
+            { expiresIn: process.env.JWT_EXPIRE || '7d' },
           );
 
           return done(null, { user, token });
         } catch (error) {
           return done(error, null);
         }
-      }
-    )
+      },
+    ),
   );
 
   // Facebook OAuth Strategy
@@ -69,7 +69,7 @@ module.exports = (passport) => {
       async (accessToken, refreshToken, profile, done) => {
         try {
           const email = profile.emails && profile.emails[0] ? profile.emails[0].value : null;
-          
+
           if (!email) {
             return done(new Error('Email not provided by Facebook'), null);
           }
@@ -77,7 +77,7 @@ module.exports = (passport) => {
           const name = profile.displayName;
 
           // Find user by email
-          let user = await User.findOne({ email });
+          let user = await User.findOne({ where: { email } });
 
           if (user) {
             // User exists, link Facebook account if not already linked
@@ -97,17 +97,17 @@ module.exports = (passport) => {
 
           // Generate JWT token
           const token = jwt.sign(
-            { id: user._id, email: user.email, role: user.role },
+            { id: user.id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: process.env.JWT_EXPIRE || '7d' }
+            { expiresIn: process.env.JWT_EXPIRE || '7d' },
           );
 
           return done(null, { user, token });
         } catch (error) {
           return done(error, null);
         }
-      }
-    )
+      },
+    ),
   );
 
   // Serialize user (not used for JWT-based auth, but required by passport)

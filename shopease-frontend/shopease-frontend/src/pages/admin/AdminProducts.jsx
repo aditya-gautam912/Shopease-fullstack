@@ -282,7 +282,7 @@ export default function AdminProducts() {
                       </td>
                       <td className="px-5 py-3">
                         <span className="text-yellow-400 text-xs">★</span>
-                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 ml-1">{p.rating?.rate}</span>
+                        <span className="text-xs font-semibold text-gray-700 dark:text-gray-200 ml-1">{p.ratingRate ?? p.rating?.rate}</span>
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">

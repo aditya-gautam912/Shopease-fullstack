@@ -68,7 +68,7 @@ const itemsValidation = [
 
   body('items.*.productId')
     .notEmpty().withMessage('Each item must have a productId')
-    .isMongoId().withMessage('Invalid product ID'),
+    .isUUID().withMessage('Invalid product ID'),
 
   body('items.*.qty')
     .isInt({ min: 1, max: 100 }).withMessage('Quantity must be between 1 and 100'),
@@ -107,7 +107,7 @@ router.post(
       .withMessage('Invalid payment method'),
   ],
   validate,
-  createGuestOrder
+  createGuestOrder,
 );
 
 // ── GET /api/orders/track/:token  (public) ────────────────
@@ -120,7 +120,7 @@ router.get(
       .isLength({ max: 100 }).withMessage('Invalid token'),
   ],
   validate,
-  trackGuestOrder
+  trackGuestOrder,
 );
 
 // ── GET /api/orders/guest/:token/invoice  (public) ────────
@@ -133,7 +133,7 @@ router.get(
       .isLength({ max: 100 }).withMessage('Invalid token'),
   ],
   validate,
-  downloadGuestInvoice
+  downloadGuestInvoice,
 );
 
 // ── POST /api/orders/razorpay-order  (auth) ───────────────
@@ -156,7 +156,7 @@ router.post(
       .withMessage('Invalid payment method'),
   ],
   validate,
-  createOrder
+  createOrder,
 );
 
 // ── GET /api/orders/my  (auth) — current user's orders ────
@@ -173,14 +173,14 @@ router.put(
   adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid order ID'),
+      .isUUID().withMessage('Invalid order ID'),
 
     body('status')
       .isIn(['pending', 'processing', 'shipped', 'delivered', 'cancelled'])
       .withMessage('Invalid order status'),
   ],
   validate,
-  updateOrderStatus
+  updateOrderStatus,
 );
 
 // ── DELETE /api/orders/:id  (admin) ───────────────────────
@@ -190,10 +190,10 @@ router.delete(
   adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid order ID'),
+      .isUUID().withMessage('Invalid order ID'),
   ],
   validate,
-  deleteOrder
+  deleteOrder,
 );
 
 // ── GET /api/orders/:id/invoice  (auth) ───────────────────
@@ -202,10 +202,10 @@ router.get(
   authMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid order ID'),
+      .isUUID().withMessage('Invalid order ID'),
   ],
   validate,
-  downloadInvoice
+  downloadInvoice,
 );
 
 module.exports = router;

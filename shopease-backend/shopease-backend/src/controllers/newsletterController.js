@@ -1,13 +1,7 @@
-/**
- * src/controllers/newsletterController.js
- * Newsletter subscription controller
- */
-
-const Newsletter = require('../models/Newsletter');
+const { Newsletter } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const crypto = require('crypto');
 
-// ── POST /api/newsletter/subscribe ────────────────────────
 const subscribe = asyncHandler(async (req, res) => {
   const { email } = req.body;
 
@@ -15,8 +9,7 @@ const subscribe = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: 'Email is required' });
   }
 
-  // Check if email already exists
-  const existing = await Newsletter.findOne({ email: email.toLowerCase() });
+  const existing = await Newsletter.findOne({ where: { email: email.toLowerCase() } });
 
   if (existing) {
     if (existing.active) {
@@ -24,19 +17,16 @@ const subscribe = asyncHandler(async (req, res) => {
         success: false,
         message: 'This email is already subscribed to our newsletter',
       });
-    } else {
-      // Reactivate subscription
-      existing.active = true;
-      existing.subscribedAt = new Date();
-      await existing.save();
-      return res.json({
-        success: true,
-        message: 'Welcome back! Your subscription has been reactivated.',
-      });
     }
+    existing.active = true;
+    existing.subscribedAt = new Date();
+    await existing.save();
+    return res.json({
+      success: true,
+      message: 'Welcome back! Your subscription has been reactivated.',
+    });
   }
 
-  // Create unsubscribe token
   const unsubscribeToken = crypto.randomBytes(32).toString('hex');
 
   const newsletter = await Newsletter.create({
@@ -51,11 +41,10 @@ const subscribe = asyncHandler(async (req, res) => {
   });
 });
 
-// ── POST /api/newsletter/unsubscribe/:token ───────────────
 const unsubscribe = asyncHandler(async (req, res) => {
   const { token } = req.params;
 
-  const subscription = await Newsletter.findOne({ unsubscribeToken: token });
+  const subscription = await Newsletter.findOne({ where: { unsubscribeToken: token } });
 
   if (!subscription) {
     return res.status(404).json({
@@ -73,28 +62,25 @@ const unsubscribe = asyncHandler(async (req, res) => {
   });
 });
 
-// ── GET /api/newsletter/admin/subscribers  (admin) ────────
 const getAllSubscribers = asyncHandler(async (req, res) => {
   const { active, page = 1, limit = 50 } = req.query;
 
-  const filter = {};
+  const where = {};
   if (active !== undefined) {
-    filter.active = active === 'true';
+    where.active = active === 'true';
   }
 
   const pageNum = Math.max(1, parseInt(page, 10));
   const limitNum = Math.min(100, parseInt(limit, 10));
-  const skip = (pageNum - 1) * limitNum;
+  const offset = (pageNum - 1) * limitNum;
 
-  const [subscribers, total] = await Promise.all([
-    Newsletter.find(filter)
-      .sort({ subscribedAt: -1 })
-      .skip(skip)
-      .limit(limitNum)
-      .select('email active subscribedAt')
-      .lean(),
-    Newsletter.countDocuments(filter),
-  ]);
+  const { rows: subscribers, count: total } = await Newsletter.findAndCountAll({
+    where,
+    order: [['subscribedAt', 'DESC']],
+    offset,
+    limit: limitNum,
+    attributes: ['email', 'active', 'subscribedAt'],
+  });
 
   res.json({
     success: true,

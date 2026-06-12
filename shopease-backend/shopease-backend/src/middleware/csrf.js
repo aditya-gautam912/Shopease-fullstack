@@ -1,12 +1,12 @@
 /**
  * src/middleware/csrf.js
  * CSRF (Cross-Site Request Forgery) protection using double-submit cookie pattern.
- * 
+ *
  * How it works:
  * 1. Server generates a CSRF token and sends it in a cookie + response body
  * 2. Frontend stores the token and sends it in the X-CSRF-Token header
  * 3. Server validates that the header matches the cookie
- * 
+ *
  * This protects against CSRF because:
  * - Attackers can't read cookies from other domains (Same-Origin Policy)
  * - So they can't set the X-CSRF-Token header correctly
@@ -46,10 +46,10 @@ const {
 const csrfTokenGenerator = (req, res, next) => {
   // Generate token and set it in cookie automatically
   const token = generateCsrfToken(req, res);
-  
+
   // Also attach to request for easy access in routes
   req.csrfToken = token;
-  
+
   next();
 };
 
@@ -91,7 +91,7 @@ const conditionalCsrf = (req, res, next) => {
   if (skipCsrfRoutes.some(route => req.path.startsWith(route))) {
     return next();
   }
-  
+
   // Apply CSRF protection
   return doubleCsrfProtection(req, res, next);
 };

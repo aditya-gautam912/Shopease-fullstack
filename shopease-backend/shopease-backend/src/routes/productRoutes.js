@@ -99,9 +99,9 @@ router.post(
 
     res.json({
       success: true,
-      data: { url: imageUrl }
+      data: { url: imageUrl },
     });
-  }
+  },
 );
 
 // ── Public routes ──────────────────────────────────────────
@@ -131,18 +131,18 @@ router.get(
       .escape(),
   ],
   validate,
-  getProducts
+  getProducts,
 );
 
 router.get(
   '/:id',
   [
     param('id')
-      .isMongoId().withMessage('Invalid product ID'),
+      .isUUID().withMessage('Invalid product ID'),
   ],
   validate,
   optionalAuthMiddleware,
-  getProductById
+  getProductById,
 );
 
 // ── Admin-only routes ──────────────────────────────────────
@@ -162,14 +162,14 @@ router.get(
     } catch (err) {
       next(err);
     }
-  }
+  },
 );
 
 router.post(
   '/',
   authMiddleware, adminMiddleware,
   productValidation, validate,
-  createProduct
+  createProduct,
 );
 
 router.put(
@@ -177,11 +177,11 @@ router.put(
   authMiddleware, adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid product ID'),
+      .isUUID().withMessage('Invalid product ID'),
   ],
   productValidation.map((v) => v.optional()), // all fields optional on update
   validate,
-  updateProduct
+  updateProduct,
 );
 
 router.delete(
@@ -189,10 +189,10 @@ router.delete(
   authMiddleware, adminMiddleware,
   [
     param('id')
-      .isMongoId().withMessage('Invalid product ID'),
+      .isUUID().withMessage('Invalid product ID'),
   ],
   validate,
-  deleteProduct
+  deleteProduct,
 );
 
 module.exports = router;

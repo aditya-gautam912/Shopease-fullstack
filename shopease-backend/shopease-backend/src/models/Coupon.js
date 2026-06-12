@@ -1,77 +1,41 @@
-/**
- * src/models/Coupon.js
- * Mongoose schema for coupon codes.
- * Supports percentage and fixed-amount discounts,
- * optional expiry date, usage limits, and active/inactive toggle.
- */
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const mongoose = require('mongoose');
-
-const couponSchema = new mongoose.Schema({
+const Coupon = sequelize.define('Coupon', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
   code: {
-    type:      String,
-    required:  [true, 'Coupon code is required'],
-    unique:    true,
-    uppercase: true,
-    trim:      true,
-    match:     [/^[A-Z0-9_-]{2,20}$/, 'Code must be 2-20 alphanumeric characters'],
+    type: DataTypes.STRING(20),
+    allowNull: false,
+    unique: true,
+    set(val) { this.setDataValue('code', String(val).toUpperCase().trim()); },
+    validate: { is: { args: /^[A-Z0-9_-]{2,20}$/, msg: 'Code must be 2-20 alphanumeric characters' } },
   },
-
-  description: {
-    type:    String,
-    default: '',
-    trim:    true,
-  },
-
-  // 'percentage' = X% off  |  'fixed' = flat ₹ off
+  description: { type: DataTypes.STRING(255), defaultValue: '' },
   type: {
-    type:    String,
-    enum:    ['percentage', 'fixed'],
-    default: 'percentage',
+    type: DataTypes.ENUM('percentage', 'fixed'),
+    defaultValue: 'percentage',
   },
-
-  // For percentage: 0.10 = 10%.  For fixed: amount in INR (e.g. 500)
   discount: {
-    type:     Number,
-    required: [true, 'Discount value is required'],
-    min:      [0,    'Discount cannot be negative'],
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false,
+    validate: { min: { args: [0], msg: 'Discount cannot be negative' } },
   },
-
-  // Minimum cart subtotal (INR) required to use this coupon
   minOrderValue: {
-    type:    Number,
-    default: 0,
-    min:     0,
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+    field: 'min_order_value',
+    validate: { min: 0 },
   },
-
-  // Optional expiry — null means no expiry
-  expiresAt: {
-    type:    Date,
-    default: null,
-  },
-
-  // Max times this coupon can be used across all users (null = unlimited)
-  usageLimit: {
-    type:    Number,
-    default: null,
-    min:     1,
-  },
-
-  // How many times it has been used so far
-  usedCount: {
-    type:    Number,
-    default: 0,
-    min:     0,
-  },
-
-  isActive: {
-    type:    Boolean,
-    default: true,
-  },
+  expiresAt: { type: DataTypes.DATE, field: 'expires_at' },
+  usageLimit: { type: DataTypes.INTEGER, field: 'usage_limit', validate: { min: 1 } },
+  usedCount: { type: DataTypes.INTEGER, defaultValue: 0, field: 'used_count', validate: { min: 0 } },
+  isActive: { type: DataTypes.BOOLEAN, defaultValue: true, field: 'is_active' },
 }, {
-  timestamps: true,
+  tableName: 'coupons',
 });
 
-// Note: 'unique: true' on 'code' already creates an index
-
-module.exports = mongoose.model('Coupon', couponSchema);
+module.exports = Coupon;

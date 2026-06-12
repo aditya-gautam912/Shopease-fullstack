@@ -14,13 +14,13 @@ const PDFDocument = require('pdfkit');
 const generateInvoice = (order, user = null) => {
   return new Promise((resolve, reject) => {
     try {
-      const doc = new PDFDocument({ 
-        size: 'A4', 
+      const doc = new PDFDocument({
+        size: 'A4',
         margin: 50,
         info: {
-          Title: `Invoice #${order._id.toString().slice(-8).toUpperCase()}`,
+          Title: `Invoice #${order.id.toString().slice(-8).toUpperCase()}`,
           Author: 'ShopEase',
-        }
+        },
       });
 
       const buffers = [];
@@ -52,7 +52,7 @@ const generateInvoice = (order, user = null) => {
         .font('Helvetica-Bold')
         .text('INVOICE', 400, 50, { align: 'right' });
 
-      const invoiceNumber = order._id.toString().slice(-8).toUpperCase();
+      const invoiceNumber = order.id.toString().slice(-8).toUpperCase();
       doc
         .fillColor(grayColor)
         .fontSize(10)
@@ -80,13 +80,13 @@ const generateInvoice = (order, user = null) => {
       y += 15;
       const customerName = user?.name || order.guestName || 'Guest Customer';
       const customerEmail = user?.email || order.guestEmail || '';
-      
+
       doc
         .fillColor(darkColor)
         .fontSize(11)
         .font('Helvetica-Bold')
         .text(customerName, 50, y);
-      
+
       y += 15;
       if (customerEmail) {
         doc
@@ -113,7 +113,7 @@ const generateInvoice = (order, user = null) => {
 
       // Invoice details (right side)
       let rightY = 130;
-      
+
       doc
         .fillColor(grayColor)
         .fontSize(10)
@@ -128,7 +128,7 @@ const generateInvoice = (order, user = null) => {
         .text('Date:', 350, rightY)
         .fillColor(darkColor)
         .text(new Date(order.createdAt).toLocaleDateString('en-IN', {
-          year: 'numeric', month: 'long', day: 'numeric'
+          year: 'numeric', month: 'long', day: 'numeric',
         }), 450, rightY, { align: 'right' });
 
       rightY += 15;
@@ -170,10 +170,10 @@ const generateInvoice = (order, user = null) => {
 
       // Table rows
       doc.font('Helvetica').fontSize(10);
-      
+
       order.items.forEach((item, index) => {
         const itemTotal = item.price * item.qty;
-        
+
         // Alternate row background
         if (index % 2 === 1) {
           doc.fillColor('#fafafa').rect(50, tableY - 5, 495, 25).fill();
@@ -191,7 +191,7 @@ const generateInvoice = (order, user = null) => {
 
       // ── Totals Section ───────────────────────────────────────
       tableY += 10;
-      
+
       doc
         .strokeColor('#e5e7eb')
         .lineWidth(1)
@@ -270,7 +270,7 @@ const generateInvoice = (order, user = null) => {
       doc
         .fillColor('#9ca3af')
         .fontSize(8)
-        .text(`Order ID: ${order._id}`, 50, footerY + 50, { align: 'center', width: 495 });
+        .text(`Order ID: ${order.id}`, 50, footerY + 50, { align: 'center', width: 495 });
 
       doc.end();
     } catch (error) {

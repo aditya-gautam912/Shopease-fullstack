@@ -114,12 +114,11 @@ Expected output:
 🗑   Clearing existing collections...
 ✅  Collections cleared
 👤  Seeding users...
-✅  Created 2 users
+✅  Created 1 user(s)
 📦  Seeding products...
-✅  Created 20 products
-🛒  Seeding orders...
-✅  Created 5 sample orders
-❤️   Added wishlist items for demo user
+✅  Created 70 products
+🎟️  Seeding coupons...
+✅  Created 4 coupons
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🎉  DATABASE SEEDED SUCCESSFULLY
@@ -127,7 +126,10 @@ Expected output:
 
 📋  Login Credentials:
   Admin  →  admin@shopease.com  /  admin123
-  User   →  user@shopease.com   /  user123
+
+📊  Seeded:
+  👤 1 user(s)
+  📦 70 products (16 electronics · 14 fashion · 14 home · 13 sports · 13 beauty)
 ```
 
 ---

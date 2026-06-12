@@ -1,11 +1,4 @@
-/**
- * src/controllers/returnController.js
- * Handles product returns and refunds with Razorpay integration.
- */
-
-const Return = require('../models/Return');
-const Order = require('../models/Order');
-const Product = require('../models/Product');
+const { Return, Order, Product, User } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const Razorpay = require('razorpay');
 
@@ -14,22 +7,18 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-// ── POST /api/returns  (auth) ─────────────────────────────
-// Create a return request
 const createReturn = asyncHandler(async (req, res) => {
   const { orderId, items, reason, description, images } = req.body;
 
-  // Validate order exists and belongs to user
-  const order = await Order.findById(orderId);
+  const order = await Order.findByPk(orderId);
   if (!order) {
     return res.status(404).json({ success: false, message: 'Order not found' });
   }
 
-  if (order.userId && order.userId.toString() !== req.user.userId) {
+  if (order.userId && order.userId !== req.user.userId) {
     return res.status(403).json({ success: false, message: 'Not authorized to return this order' });
   }
 
-  // Check if order is eligible for return (delivered status)
   if (order.status !== 'delivered') {
     return res.status(400).json({
       success: false,
@@ -37,11 +26,8 @@ const createReturn = asyncHandler(async (req, res) => {
     });
   }
 
-  // Validate items exist in the order
   for (const item of items) {
-    const orderItem = order.items.find(
-      (i) => i.productId.toString() === item.productId
-    );
+    const orderItem = order.items.find((i) => i.productId === item.productId);
     if (!orderItem) {
       return res.status(400).json({
         success: false,
@@ -56,16 +42,12 @@ const createReturn = asyncHandler(async (req, res) => {
     }
   }
 
-  // Calculate refund amount
   let refundAmount = 0;
   for (const item of items) {
-    const orderItem = order.items.find(
-      (i) => i.productId.toString() === item.productId
-    );
+    const orderItem = order.items.find((i) => i.productId === item.productId);
     refundAmount += orderItem.price * item.qty;
   }
 
-  // Create return
   const returnRequest = await Return.create({
     orderId,
     userId: req.user.userId,
@@ -76,63 +58,57 @@ const createReturn = asyncHandler(async (req, res) => {
     refundAmount,
   });
 
-  await returnRequest.populate('orderId', 'total items');
+  const populated = await Return.findByPk(returnRequest.id, {
+    include: [{ model: Order, attributes: ['total', 'items'] }],
+  });
 
   res.status(201).json({
     success: true,
-    data: returnRequest,
+    data: populated,
     message: 'Return request created successfully',
   });
 });
 
-// ── GET /api/returns/my  (auth) ───────────────────────────
-// Get user's return requests
 const getMyReturns = asyncHandler(async (req, res) => {
-  const returns = await Return.find({ userId: req.user.userId })
-    .populate('orderId', 'total items createdAt')
-    .sort({ createdAt: -1 })
-    .lean();
+  const returns = await Return.findAll({
+    where: { userId: req.user.userId },
+    include: [{ model: Order, attributes: ['total', 'items', 'createdAt'] }],
+    order: [['createdAt', 'DESC']],
+  });
 
   res.json({ success: true, data: returns });
 });
 
-// ── GET /api/admin/returns  (admin) ───────────────────────
-// Get all return requests with filtering
 const getAllReturns = asyncHandler(async (req, res) => {
   const { status, page = 1, limit = 20 } = req.query;
   const pageNum = Math.max(1, parseInt(page, 10));
   const limitNum = Math.min(100, parseInt(limit, 10));
-  const skip = (pageNum - 1) * limitNum;
+  const offset = (pageNum - 1) * limitNum;
 
-  const filter = {};
-  if (status) filter.status = status;
+  const where = {};
+  if (status) where.status = status;
 
-  const [returns, total] = await Promise.all([
-    Return.find(filter)
-      .populate('userId', 'name email')
-      .populate('orderId', 'total items createdAt')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limitNum)
-      .lean(),
-    Return.countDocuments(filter),
-  ]);
+  const { rows: returns, count: total } = await Return.findAndCountAll({
+    where,
+    include: [
+      { model: User, attributes: ['name', 'email'] },
+      { model: Order, attributes: ['total', 'items', 'createdAt'] },
+    ],
+    order: [['createdAt', 'DESC']],
+    offset,
+    limit: limitNum,
+  });
 
   res.json({
     success: true,
-    data: {
-      returns,
-      pagination: { total, page: pageNum, limit: limitNum },
-    },
+    data: { returns, pagination: { total, page: pageNum, limit: limitNum } },
   });
 });
 
-// ── PUT /api/admin/returns/:id/approve  (admin) ───────────
-// Approve a return request
 const approveReturn = asyncHandler(async (req, res) => {
   const { adminNotes } = req.body;
 
-  const returnRequest = await Return.findById(req.params.id);
+  const returnRequest = await Return.findByPk(req.params.id);
   if (!returnRequest) {
     return res.status(404).json({ success: false, message: 'Return request not found' });
   }
@@ -148,29 +124,25 @@ const approveReturn = asyncHandler(async (req, res) => {
   returnRequest.adminNotes = adminNotes || '';
   await returnRequest.save();
 
-  // Restock products
-  await Order.findById(returnRequest.orderId);
   for (const item of returnRequest.items) {
-    await Product.findByIdAndUpdate(item.productId, {
-      $inc: { stock: item.qty },
-    });
+    await Product.increment('stock', { by: item.qty, where: { id: item.productId } });
   }
 
-  await returnRequest.populate('orderId', 'total items');
+  const populated = await Return.findByPk(returnRequest.id, {
+    include: [{ model: Order, attributes: ['total', 'items'] }],
+  });
 
   res.json({
     success: true,
-    data: returnRequest,
+    data: populated,
     message: 'Return approved successfully. Product restocked.',
   });
 });
 
-// ── PUT /api/admin/returns/:id/reject  (admin) ────────────
-// Reject a return request
 const rejectReturn = asyncHandler(async (req, res) => {
   const { adminNotes } = req.body;
 
-  const returnRequest = await Return.findById(req.params.id);
+  const returnRequest = await Return.findByPk(req.params.id);
   if (!returnRequest) {
     return res.status(404).json({ success: false, message: 'Return request not found' });
   }
@@ -186,20 +158,18 @@ const rejectReturn = asyncHandler(async (req, res) => {
   returnRequest.adminNotes = adminNotes || '';
   await returnRequest.save();
 
-  await returnRequest.populate('orderId', 'total items');
-
-  res.json({
-    success: true,
-    data: returnRequest,
-    message: 'Return rejected',
+  const populated = await Return.findByPk(returnRequest.id, {
+    include: [{ model: Order, attributes: ['total', 'items'] }],
   });
+
+  res.json({ success: true, data: populated, message: 'Return rejected' });
 });
 
-// ── PUT /api/admin/returns/:id/refund  (admin) ────────────
-// Process refund via Razorpay
 const processRefund = asyncHandler(async (req, res) => {
-  const returnRequest = await Return.findById(req.params.id).populate('orderId');
-  
+  const returnRequest = await Return.findByPk(req.params.id, {
+    include: [{ model: Order }],
+  });
+
   if (!returnRequest) {
     return res.status(404).json({ success: false, message: 'Return request not found' });
   }
@@ -211,9 +181,8 @@ const processRefund = asyncHandler(async (req, res) => {
     });
   }
 
-  const order = returnRequest.orderId;
+  const order = returnRequest.Order;
 
-  // Check if order was paid via Razorpay
   if (!order.razorpayPaymentId) {
     return res.status(400).json({
       success: false,
@@ -222,23 +191,20 @@ const processRefund = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Process refund via Razorpay
     const refund = await razorpay.payments.refund(order.razorpayPaymentId, {
-      amount: Math.round(returnRequest.refundAmount * 100), // Convert to paise
+      amount: Math.round(returnRequest.refundAmount * 100),
       speed: 'normal',
       notes: {
-        returnId: returnRequest._id.toString(),
-        orderId: order._id.toString(),
+        returnId: returnRequest.id,
+        orderId: order.id,
       },
     });
 
-    // Update return with refund details
     returnRequest.status = 'refunded';
     returnRequest.razorpayRefundId = refund.id;
     returnRequest.refundMethod = 'razorpay';
     await returnRequest.save();
 
-    // Update order payment status if full refund
     if (returnRequest.refundAmount >= order.total) {
       order.paymentStatus = 'refunded';
       await order.save();
@@ -259,10 +225,6 @@ const processRefund = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  createReturn,
-  getMyReturns,
-  getAllReturns,
-  approveReturn,
-  rejectReturn,
-  processRefund,
+  createReturn, getMyReturns, getAllReturns,
+  approveReturn, rejectReturn, processRefund,
 };

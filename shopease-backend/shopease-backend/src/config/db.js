@@ -1,19 +1,33 @@
 /**
  * src/config/db.js
- * Establishes and manages the MongoDB connection via Mongoose.
- * Called once at server startup from server.js.
+ * Initialises and exports a Sequelize instance connected to PostgreSQL.
  */
 
-const mongoose = require('mongoose');
+const { Sequelize } = require('sequelize');
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  pool: {
+    max: 10,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+  define: {
+    timestamps: true,
+    underscored: true,
+  },
+});
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`✅  MongoDB connected: ${conn.connection.host}`);
+    await sequelize.authenticate();
+    console.log(`✅  PostgreSQL connected: ${sequelize.options.host}`);
   } catch (error) {
-    console.error(`❌  MongoDB connection error: ${error.message}`);
+    console.error(`❌  PostgreSQL connection error: ${error.message}`);
     process.exit(1);
   }
 };
 
-module.exports = connectDB;
+module.exports = { sequelize, connectDB };

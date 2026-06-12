@@ -1,91 +1,49 @@
-/**
- * src/models/Ticket.js
- * Mongoose schema and model for customer support tickets.
- * Supports both authenticated users and guest submissions.
- */
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/db');
 
-const mongoose = require('mongoose');
-
-const responseSchema = new mongoose.Schema({
+const Ticket = sequelize.define('Ticket', {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: null,
-  },
-  message: {
-    type: String,
-    required: [true, 'Response message is required'],
-    trim: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-}, { _id: true });
-
-const ticketSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    default: null,
+    type: DataTypes.UUID,
+    references: { model: 'users', key: 'id' },
+    field: 'user_id',
   },
   guestEmail: {
-    type: String,
-    trim: true,
-    lowercase: true,
-    default: null,
-    match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'],
+    type: DataTypes.STRING(255),
+    validate: { isEmail: { msg: 'Please enter a valid email' } },
+    field: 'guest_email',
   },
-  guestName: {
-    type: String,
-    trim: true,
-    default: null,
-  },
+  guestName: { type: DataTypes.STRING(100), field: 'guest_name' },
   subject: {
-    type: String,
-    required: [true, 'Subject is required'],
-    trim: true,
+    type: DataTypes.STRING(255),
+    allowNull: false,
   },
   message: {
-    type: String,
-    required: [true, 'Message is required'],
-    trim: true,
+    type: DataTypes.TEXT,
+    allowNull: false,
   },
   status: {
-    type: String,
-    enum: {
-      values: ['open', 'in-progress', 'resolved'],
-      message: '{VALUE} is not a valid status',
-    },
-    default: 'open',
+    type: DataTypes.ENUM('open', 'in-progress', 'resolved'),
+    defaultValue: 'open',
   },
   priority: {
-    type: String,
-    enum: {
-      values: ['low', 'medium', 'high'],
-      message: '{VALUE} is not a valid priority',
-    },
-    default: 'medium',
+    type: DataTypes.ENUM('low', 'medium', 'high'),
+    defaultValue: 'medium',
   },
   responses: {
-    type: [responseSchema],
-    default: [],
+    type: DataTypes.JSONB,
+    defaultValue: [],
   },
 }, {
-  timestamps: true,
+  tableName: 'tickets',
+  indexes: [
+    { fields: ['user_id', 'status'] },
+    { fields: ['status', 'priority', 'created_at'] },
+  ],
 });
 
-// Validate that either userId or both guestEmail and guestName are provided
-ticketSchema.pre('validate', function(next) {
-  if (!this.userId && (!this.guestEmail || !this.guestName)) {
-    this.invalidate('guestEmail', 'Email is required for guest tickets');
-    this.invalidate('guestName', 'Name is required for guest tickets');
-  }
-  next();
-});
-
-// Index for efficient queries
-ticketSchema.index({ userId: 1, status: 1 });
-ticketSchema.index({ status: 1, priority: 1, createdAt: -1 });
-
-module.exports = mongoose.model('Ticket', ticketSchema);
+module.exports = Ticket;

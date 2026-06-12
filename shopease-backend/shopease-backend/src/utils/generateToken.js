@@ -16,12 +16,12 @@ const crypto = require('crypto');
 const generateAccessToken = (user) => {
   return jwt.sign(
     {
-      userId: user._id,
+      userId: user.id,
       email:  user.email,
       role:   user.role,
     },
     process.env.JWT_SECRET,
-    { expiresIn: '15m' }
+    { expiresIn: '15m' },
   );
 };
 
@@ -33,11 +33,11 @@ const generateAccessToken = (user) => {
 const generateRefreshToken = (user) => {
   return jwt.sign(
     {
-      userId: user._id,
+      userId: user.id,
       tokenId: crypto.randomBytes(16).toString('hex'), // unique per token
     },
     process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET + '_refresh',
-    { expiresIn: '7d' }
+    { expiresIn: '7d' },
   );
 };
 
