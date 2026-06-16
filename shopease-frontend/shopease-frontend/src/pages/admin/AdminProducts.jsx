@@ -9,13 +9,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 import { productService } from '../../services/productService';
+import { API_ORIGIN }     from '../../services/api';
 import { fmtPrice }       from '../../utils/helpers';
 import Modal              from '../../components/common/Modal';
 import PageSpinner        from '../../components/common/PageSpinner';
 
 const CATEGORIES = ['electronics', 'fashion', 'home', 'sports', 'beauty'];
 const FALLBACK   = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&q=60';
-const API_BASE   = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000';
 
 // ── ImageField ─────────────────────────────────────────────
 // Lets the admin either upload a file OR paste a URL.
@@ -35,7 +35,7 @@ function ImageField({ currentUrl, onUrl, error }) {
     try {
       const { url } = await productService.uploadImage(file);
       // url is like /uploads/product-xxx.jpg — prepend the API host
-      const fullUrl = url.startsWith('http') ? url : `${API_BASE}${url}`;
+      const fullUrl = url.startsWith('http') ? url : `${API_ORIGIN}${url}`;
       setUrlInput(fullUrl);
       onUrl(fullUrl);
     } catch (err) {
@@ -54,7 +54,7 @@ function ImageField({ currentUrl, onUrl, error }) {
 
   // Resolve display URL — local uploads need the API host prepended
   const displayUrl = urlInput
-    ? (urlInput.startsWith('http') ? urlInput : `${API_BASE}${urlInput}`)
+    ? (urlInput.startsWith('http') ? urlInput : `${API_ORIGIN}${urlInput}`)
     : '';
 
   return (

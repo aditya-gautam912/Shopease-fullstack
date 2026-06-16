@@ -15,6 +15,28 @@
 
 import axios from 'axios';
 
+const normalizeApiBaseUrl = (rawValue) => {
+  const fallback = 'http://localhost:5000/api';
+  const raw = String(rawValue || fallback)
+    .split(',')
+    .map((value) => value.trim())
+    .find(Boolean) || fallback;
+
+  const withoutTrailingSlash = raw.replace(/\/+$/, '');
+  const withApiPath = withoutTrailingSlash.endsWith('/api')
+    ? withoutTrailingSlash
+    : `${withoutTrailingSlash}/api`;
+
+  if (import.meta.env.PROD && /(^https?:\/\/localhost|^https?:\/\/127\.0\.0\.1)/i.test(withApiPath)) {
+    throw new Error('VITE_API_BASE_URL must point to the deployed backend in production.');
+  }
+
+  return withApiPath;
+};
+
+export const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_BASE_URL);
+export const API_ORIGIN = API_BASE_URL.replace(/\/api$/, '');
+
 // ── Store reference (injected after store is created) ──────
 let _store = null;
 const isNativeApp = () => {
@@ -35,7 +57,7 @@ export const injectStore = (store) => {
 };
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
+  baseURL: API_BASE_URL,
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
   withCredentials: true,

@@ -13,6 +13,7 @@ import Modal                              from '../../components/common/Modal';
 
 const STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
 const FALLBACK = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&q=60';
+const shortId = (value, size = 8) => String(value || '').slice(-size).toUpperCase() || 'UNKNOWN';
 
 export default function AdminOrders() {
   const [orders,       setOrders]       = useState([]);
@@ -65,7 +66,7 @@ export default function AdminOrders() {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return (
-      o._id.toLowerCase().includes(q) ||
+      String(o._id || '').toLowerCase().includes(q) ||
       (o.userId?.name  || '').toLowerCase().includes(q) ||
       (o.userId?.email || '').toLowerCase().includes(q)
     );
@@ -115,7 +116,7 @@ export default function AdminOrders() {
                     className="border-t border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
 
                     <td className="px-5 py-3 font-mono text-xs text-gray-500">
-                      #{order._id.slice(-8).toUpperCase()}
+                      #{shortId(order._id)}
                     </td>
 
                     <td className="px-5 py-3">
@@ -179,7 +180,7 @@ export default function AdminOrders() {
       )}
 
       {/* ── View Order Items Modal ──────────────────────── */}
-      <Modal open={!!viewing} onClose={() => setViewing(null)} title={viewing ? `Order #${viewing._id.slice(-8).toUpperCase()}` : ''} maxWidth="max-w-lg">
+      <Modal open={!!viewing} onClose={() => setViewing(null)} title={viewing ? `Order #${shortId(viewing._id)}` : ''} maxWidth="max-w-lg">
         {viewing && (
           <div className="p-6">
             {/* Customer + summary */}
@@ -269,7 +270,7 @@ export default function AdminOrders() {
           <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Delete Order?</h3>
           <p className="text-sm text-gray-500 mb-1">
             Order <span className="font-mono font-bold text-gray-700 dark:text-gray-200">
-              #{deleting?._id.slice(-8).toUpperCase()}
+              #{shortId(deleting?._id)}
             </span>
           </p>
           <p className="text-sm text-gray-500 mb-6">

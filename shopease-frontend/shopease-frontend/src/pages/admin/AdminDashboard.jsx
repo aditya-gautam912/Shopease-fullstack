@@ -49,6 +49,7 @@ const STATUS_COLORS = {
 
 // ── Utility ────────────────────────────────────────────────
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const shortId = (value, size = 8) => String(value || '').slice(-size).toUpperCase() || 'UNKNOWN';
 
 // ── Empty chart placeholder ────────────────────────────────
 function EmptyChart() {
@@ -506,7 +507,7 @@ export default function AdminDashboard() {
                   <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
                     {order.userId?.name || 'Guest'}
                   </p>
-                  <p className="text-xs text-gray-400 font-mono">#{order._id.slice(-8).toUpperCase()} · {fmtDate(order.createdAt)}</p>
+                  <p className="text-xs text-gray-400 font-mono">#{shortId(order._id)} · {fmtDate(order.createdAt)}</p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <p className="text-sm font-extrabold text-gray-900 dark:text-white">{fmtPrice(order.total)}</p>

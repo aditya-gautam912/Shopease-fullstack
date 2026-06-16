@@ -142,6 +142,7 @@ function InstallPrompt() {
 function CartSync() {
   const dispatch   = useDispatch();
   const isLoggedIn = useSelector(selectIsLoggedIn);
+  const isAdmin    = useSelector(selectIsAdmin);
   const items      = useSel(selectCartItems);
   const prevToken  = useRef(null);
   const syncTimer  = useRef(null);
@@ -151,7 +152,7 @@ function CartSync() {
   // Do not merge here; otherwise an admin/user can inherit another user's local cart.
   useEffect(() => {
     const wasLoggedOut = !prevToken.current;
-    const nowLoggedIn  = isLoggedIn;
+    const nowLoggedIn  = isLoggedIn && !isAdmin;
     prevToken.current  = isLoggedIn;
 
     if (!nowLoggedIn || !wasLoggedOut) return;
@@ -167,18 +168,18 @@ function CartSync() {
         hydratingCart.current = false;
       }
     })();
-  }, [isLoggedIn, dispatch]);
+  }, [isLoggedIn, isAdmin, dispatch]);
 
   // On every cart change (when logged in) — debounced sync to server
   useEffect(() => {
-    if (!isLoggedIn) return;
+    if (!isLoggedIn || isAdmin) return;
     if (hydratingCart.current) return;
     clearTimeout(syncTimer.current);
     syncTimer.current = setTimeout(() => {
       cartService.syncCart(items).catch(() => {});
     }, 600);
     return () => clearTimeout(syncTimer.current);
-  }, [items, isLoggedIn]);
+  }, [items, isLoggedIn, isAdmin]);
 
   return null;
 }
