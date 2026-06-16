@@ -1,3 +1,4 @@
+const { sequelize } = require('../config/db');
 const User = require('./User');
 const Address = require('./Address');
 const RefreshToken = require('./RefreshToken');
@@ -62,6 +63,7 @@ for (const model of [User, Address, RefreshToken, Product, ProductVariant, CartI
 }
 
 module.exports = {
+  sequelize,
   User,
   Address,
   RefreshToken,
