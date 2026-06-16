@@ -16,7 +16,6 @@ import { productService }  from '../services/productService';
 import { userService }     from '../services/index';
 import { fmtPrice, fakeDiscount, ratingStars } from '../utils/helpers';
 
-const id = (p) => p._id || p.id;
 import { SkeletonDetail }  from '../components/common/SkeletonCard';
 import ProductCard         from '../components/product/ProductCard';
 import { useScrollTop }    from '../hooks';
@@ -54,7 +53,7 @@ export default function ProductDetailPage() {
   );
 
   const { product, related = [] } = data;
-  const disc     = fakeDiscount(id(product));
+  const disc     = fakeDiscount(product._id || product.id);
   const oldPrice = product.oldPrice || parseFloat((product.price / (1 - disc / 100)).toFixed(2));
 
   const handleAddCart = () => {
@@ -66,7 +65,7 @@ export default function ProductDetailPage() {
     if (!isLoggedIn) { toast.error('Sign in to save items'); return; }
     setWishLoading(true);
     try {
-      await userService.toggleWishlist(id(product));
+      await userService.toggleWishlist(product._id || product.id);
       setWishlisted((w) => !w);
       toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist ♡');
     } catch { toast.error('Could not update wishlist'); }
@@ -214,7 +213,7 @@ export default function ProductDetailPage() {
       </div>
 
       {/* Reviews */}
-      <ReviewSection productId={id(product)} productRating={{ rate: product.ratingRate, count: product.ratingCount }} />
+      <ReviewSection productId={product._id || product.id} productRating={{ rate: product.ratingRate, count: product.ratingCount }} />
 
       {/* Related products */}
       {related.length > 0 && (
