@@ -51,7 +51,6 @@ const getProducts = asyncHandler(async (req, res) => {
     order,
     offset,
     limit: limitNum,
-    raw: true,
   });
 
   res.json({

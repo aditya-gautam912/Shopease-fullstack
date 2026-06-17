@@ -14,7 +14,6 @@ const validateCouponCode = asyncHandler(async (req, res) => {
   const sub = parseFloat(subtotal);
   const coupon = await Coupon.findOne({
     where: { code: code.trim().toUpperCase(), isActive: true },
-    raw: true,
   });
 
   if (!coupon) {

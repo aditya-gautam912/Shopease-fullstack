@@ -145,7 +145,6 @@ const getOutOfStock = asyncHandler(async (req, res) => {
   const outOfStock = await Product.findAll({
     attributes: ['id', 'title', 'category', 'image', 'price'],
     where: { isActive: true, stock: 0 },
-    raw: true,
   });
   res.json({ success: true, data: { count: outOfStock.length, products: outOfStock } });
 });
