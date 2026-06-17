@@ -17,7 +17,7 @@ const errorHandler = (err, req, res, _next) => {
     message = 'Referenced resource not found';
     statusCode = 404;
   } else if (err instanceof ValidationError) {
-    message = err.errors.map((e) => e.message).join(', ');
+    message = (err.errors || []).map((e) => e.message).join(', ');
     statusCode = 422;
   } else if (err instanceof DatabaseError || err instanceof ConnectionError) {
     message = 'Database error occurred';

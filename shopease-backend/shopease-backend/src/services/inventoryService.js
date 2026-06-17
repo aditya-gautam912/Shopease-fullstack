@@ -75,7 +75,7 @@ const decrementStock = async (items) => {
               return;
             }
             const variant = await ProductVariant.findByPk(item.variantId, { attributes: ['stock'], raw: true, transaction: t });
-            newStock = variant.stock;
+            newStock = variant ? variant.stock : 0;
           } else {
             const [affected] = await Product.update(
               { stock: sequelize.literal(`"stock" - ${parseInt(item.qty, 10)}`) },
@@ -86,7 +86,7 @@ const decrementStock = async (items) => {
               return;
             }
             const product = await Product.findByPk(item.productId, { attributes: ['stock'], raw: true, transaction: t });
-            newStock = product.stock;
+            newStock = product ? product.stock : 0;
           }
 
           decremented.push({ productId: item.productId, variantId: item.variantId, qty: item.qty, newStock });

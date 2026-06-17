@@ -135,6 +135,9 @@ const updateProduct = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: 'Product not found' });
   }
   const product = await Product.findByPk(req.params.id);
+  if (!product) {
+    return res.status(404).json({ success: false, message: 'Product not found after update' });
+  }
   res.json({ success: true, data: product.toJSON() });
 });
 

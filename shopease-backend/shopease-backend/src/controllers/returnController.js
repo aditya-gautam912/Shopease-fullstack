@@ -182,6 +182,9 @@ const processRefund = asyncHandler(async (req, res) => {
   }
 
   const order = returnRequest.Order;
+  if (!order) {
+    return res.status(404).json({ success: false, message: 'Associated order not found' });
+  }
 
   if (!order.razorpayPaymentId) {
     return res.status(400).json({

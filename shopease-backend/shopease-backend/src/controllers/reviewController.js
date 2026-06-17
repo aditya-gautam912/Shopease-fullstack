@@ -12,8 +12,8 @@ const recalcProductRating = async (productId) => {
   });
   await Product.update(
     {
-      ratingRate: parseFloat(result.ratingRate || 0).toFixed(1),
-      ratingCount: parseInt(result.ratingCount || 0, 10),
+      ratingRate: result ? parseFloat(result.ratingRate || 0).toFixed(1) : 0,
+      ratingCount: result ? parseInt(result.ratingCount || 0, 10) : 0,
     },
     { where: { id: productId } },
   );
