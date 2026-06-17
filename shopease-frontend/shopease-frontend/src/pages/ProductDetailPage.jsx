@@ -21,7 +21,7 @@ import ProductCard         from '../components/product/ProductCard';
 import { useScrollTop }    from '../hooks';
 import ReviewSection      from '../components/product/ReviewSection';
 
-const FALLBACK = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=70';
+const FALLBACK = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 600%22 fill=%22%23e5e7eb%22%3E%3Crect width=%22600%22 height=%22600%22/%3E%3Cpath d=%22M240 210h120a30 30 0 0 1 30 30v120a30 30 0 0 1-30 30H240a30 30 0 0 1-30-30V240a30 30 0 0 1 30-30zm0 0l60 90 60-90m-75 150h150l-45-75-45 45-60-60%22 stroke=%22%239ca3af%22 stroke-width=%2212%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E';
 
 export default function ProductDetailPage() {
   const { id }       = useParams();

@@ -17,7 +17,7 @@ import { fmtPrice, fakeDiscount, ratingStars } from '../../utils/helpers';
 
 const id = (p) => p._id || p.id;
 
-const FALLBACK = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=60';
+const FALLBACK = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22 fill=%22%23e5e7eb%22%3E%3Crect width=%22400%22 height=%22400%22/%3E%3Cpath d=%22M160 140h80a20 20 0 0 1 20 20v80a20 20 0 0 1-20 20H160a20 20 0 0 1-20-20V160a20 20 0 0 1 20-20zm0 0l40 60 40-60m-50 100h100l-30-50-30 30-40-40%22 stroke=%22%239ca3af%22 stroke-width=%228%22 fill=%22none%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22/%3E%3C/svg%3E';
 
 export default function ProductCard({ product, wishlistIds = [], onWishlistToggle }) {
   const dispatch    = useDispatch();
