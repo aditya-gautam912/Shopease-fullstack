@@ -505,7 +505,7 @@ export default function AdminDashboard() {
               >
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                    {order.userId?.name || 'Guest'}
+                    {order.User?.name || order.guestName || 'Guest'}
                   </p>
                   <p className="text-xs text-gray-400 font-mono">#{shortId(order._id)} · {fmtDate(order.createdAt)}</p>
                 </div>

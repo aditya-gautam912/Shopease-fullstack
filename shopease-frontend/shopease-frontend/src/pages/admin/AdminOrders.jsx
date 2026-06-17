@@ -67,8 +67,8 @@ export default function AdminOrders() {
     const q = search.toLowerCase();
     return (
       String(o._id || '').toLowerCase().includes(q) ||
-      (o.userId?.name  || '').toLowerCase().includes(q) ||
-      (o.userId?.email || '').toLowerCase().includes(q)
+      (o.User?.name  || o.guestName  || '').toLowerCase().includes(q) ||
+      (o.User?.email || o.guestEmail || '').toLowerCase().includes(q)
     );
   });
 
@@ -120,8 +120,8 @@ export default function AdminOrders() {
                     </td>
 
                     <td className="px-5 py-3">
-                      <p className="font-semibold text-gray-900 dark:text-gray-100">{order.userId?.name || 'Guest'}</p>
-                      <p className="text-xs text-gray-400 truncate max-w-[160px]">{order.userId?.email}</p>
+                      <p className="font-semibold text-gray-900 dark:text-gray-100">{order.User?.name || order.guestName || 'Guest'}</p>
+                      <p className="text-xs text-gray-400 truncate max-w-[160px]">{order.User?.email || order.guestEmail}</p>
                     </td>
 
                     {/* Items count — clickable to view detail */}
@@ -186,8 +186,8 @@ export default function AdminOrders() {
             {/* Customer + summary */}
             <div className="grid grid-cols-2 gap-3 mb-5">
               {[
-                { label: 'Customer',  value: viewing.userId?.name  || 'Guest' },
-                { label: 'Email',     value: viewing.userId?.email || '—' },
+                { label: 'Customer',  value: viewing.User?.name || viewing.guestName || 'Guest' },
+                { label: 'Email',     value: viewing.User?.email || viewing.guestEmail || '—' },
                 { label: 'Date',      value: fmtDate(viewing.createdAt) },
                 { label: 'Payment',   value: viewing.paymentMethod?.toUpperCase() },
                 { label: 'Status',    value: viewing.status },
