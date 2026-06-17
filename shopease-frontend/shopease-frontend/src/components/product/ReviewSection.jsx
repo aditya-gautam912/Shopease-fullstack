@@ -206,9 +206,9 @@ function ReviewCard({ review, currentUserId, isAdmin, productId, onUpdated, onDe
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      await reviewService.deleteReview(productId, review._id);
+      await reviewService.deleteReview(productId, review._id || review.id);
       toast.success('Review deleted');
-      onDeleted(review._id);
+      onDeleted(review._id || review.id);
     } catch (err) {
       toast.error(err.message || 'Could not delete review');
     } finally {
@@ -219,7 +219,7 @@ function ReviewCard({ review, currentUserId, isAdmin, productId, onUpdated, onDe
 
   const handleToggleVisibility = async () => {
     try {
-      const updated = await reviewService.toggleVisibility(review._id);
+      const updated = await reviewService.toggleVisibility(review._id || review.id);
       toast.success(updated.isVisible ? 'Review shown' : 'Review hidden');
       onUpdated(updated);
     } catch (err) {

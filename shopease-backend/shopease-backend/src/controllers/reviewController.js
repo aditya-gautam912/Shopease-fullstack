@@ -33,7 +33,6 @@ const getReviews = asyncHandler(async (req, res) => {
     offset,
     limit,
     attributes: ['id', 'userName', 'rating', 'title', 'body', 'createdAt', 'userId'],
-    raw: true,
   });
 
   const [breakdown] = await sequelize.query(`
