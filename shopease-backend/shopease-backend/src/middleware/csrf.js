@@ -15,7 +15,6 @@
 const { doubleCsrf } = require('csrf-csrf');
 
 const CSRF_SECRET = process.env.CSRF_SECRET || 'shopease-csrf-secret-change-in-production';
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // ── Configure double-submit CSRF protection ────────────────
 const {
@@ -24,12 +23,12 @@ const {
   invalidCsrfTokenError,
 } = doubleCsrf({
   getSecret: () => CSRF_SECRET,
-  // Session identifier - use IP + User-Agent as fallback for anonymous users
-  getSessionIdentifier: (req) => {
-    // If user is logged in, use their ID; otherwise use IP
-    return req.user?.userId || req.ip || 'anonymous';
-  },
-  cookieName: IS_PRODUCTION ? '__Host-shopease.x-csrf-token' : 'shopease.x-csrf-token',
+  // Session identifier - use a stable per-browser value.
+  // req.ip can change between requests (Render proxy), and req.user is not set
+  // during CSRF validation (runs before authMiddleware). Use a constant to ensure
+  // the HMAC generated at token-creation time matches at validation time.
+  getSessionIdentifier: () => 'shopease-session',
+  cookieName: 'shopease.x-csrf-token',
   cookieOptions: {
     httpOnly: true,
     sameSite: 'none', // Required for cross-domain (frontend/backend on different Render subdomains)
@@ -89,7 +88,8 @@ const conditionalCsrf = (req, res, next) => {
   }
 
   // Skip CSRF check for certain routes (like webhooks from payment gateways)
-  if (skipCsrfRoutes.some(route => req.path.startsWith(route))) {
+  // Use req.originalUrl (absolute) because req.path is relative to the /api mount point
+  if (skipCsrfRoutes.some(route => req.originalUrl.startsWith(route))) {
     return next();
   }
 
