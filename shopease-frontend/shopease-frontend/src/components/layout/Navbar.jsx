@@ -16,7 +16,7 @@ import { fetchWishlist, selectWishlistCount } from '../../redux/slices/wishlistS
 import { useDebounce, useClickOutside } from '../../hooks';
 import { productService } from '../../services/productService';
 import { authService } from '../../services/authService';
-import { getInitials, truncate } from '../../utils/helpers';
+import { fmtPrice, getInitials, truncate } from '../../utils/helpers';
 
 export default function Navbar() {
   const dispatch      = useDispatch();
@@ -144,7 +144,7 @@ export default function Navbar() {
                           onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&q=60'; }} />
                         <div>
                           <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{truncate(p.title, 40)}</p>
-                          <p className="text-xs text-primary-500 font-bold">${p.price.toFixed(2)}</p>
+                          <p className="text-xs text-primary-500 font-bold">{fmtPrice(p.price)}</p>
                         </div>
                       </button>
                     ))}
