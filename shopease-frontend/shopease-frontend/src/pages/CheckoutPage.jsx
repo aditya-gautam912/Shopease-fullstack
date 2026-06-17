@@ -172,7 +172,7 @@ export default function CheckoutPage() {
       city: data.city || '',
       state: data.state || '',
       zip: data.zip || '',
-      country: data.country || defaultAddress?.country || 'US',
+      country: data.country || defaultAddress?.country || 'India',
     });
     setStep(2);
   };
@@ -519,7 +519,7 @@ export default function CheckoutPage() {
                 )}
               </div>
             ))}
-            <input type="hidden" value={defaultAddress?.country || 'US'} {...register('country')} />
+            <input type="hidden" value={defaultAddress?.country || 'India'} {...register('country')} />
             <button 
               type="submit" 
               className="btn-primary w-full py-3 justify-center mt-2 touch-manipulation"
