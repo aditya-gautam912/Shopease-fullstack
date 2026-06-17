@@ -81,23 +81,27 @@ const getProductById = asyncHandler(async (req, res) => {
   const productJson = product.toJSON();
 
   if (req.user && req.user.userId) {
-    const rv = await RecentlyViewed.findOne({
-      where: { userId: req.user.userId, productId: productJson.id },
-    });
-    if (!rv) {
-      await RecentlyViewed.create({ userId: req.user.userId, productId: productJson.id });
-    } else {
-      await rv.touch();
-    }
-
-    const count = await RecentlyViewed.count({ where: { userId: req.user.userId } });
-    if (count > 20) {
-      const oldest = await RecentlyViewed.findAll({
-        where: { userId: req.user.userId },
-        order: [['updatedAt', 'ASC']],
-        limit: count - 20,
+    try {
+      const rv = await RecentlyViewed.findOne({
+        where: { userId: req.user.userId, productId: productJson.id },
       });
-      await RecentlyViewed.destroy({ where: { id: oldest.map(o => o.id) } });
+      if (!rv) {
+        await RecentlyViewed.create({ userId: req.user.userId, productId: productJson.id });
+      } else {
+        await rv.touch();
+      }
+
+      const count = await RecentlyViewed.count({ where: { userId: req.user.userId } });
+      if (count > 20) {
+        const oldest = await RecentlyViewed.findAll({
+          where: { userId: req.user.userId },
+          order: [['updatedAt', 'ASC']],
+          limit: count - 20,
+        });
+        await RecentlyViewed.destroy({ where: { id: oldest.map(o => o.id) } });
+      }
+    } catch (err) {
+      console.error('Failed to track recently viewed:', err.message, err.stack);
     }
   }
 
