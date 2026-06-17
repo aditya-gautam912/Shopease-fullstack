@@ -52,12 +52,25 @@ Return.belongsTo(Order, { foreignKey: 'orderId' });
 User.hasMany(Ticket, { foreignKey: 'userId', as: 'tickets' });
 Ticket.belongsTo(User, { foreignKey: 'userId' });
 
+// DECIMAL fields per model — pg returns them as strings, coerce to numbers for frontend
+const DECIMAL_FIELDS = {
+  Product:       ['price', 'oldPrice', 'ratingRate'],
+  ProductVariant:['price'],
+  Order:         ['subtotal', 'discount', 'shipping', 'total'],
+  Coupon:        ['discount', 'minOrderValue'],
+  Return:        ['refundAmount'],
+};
+
 // Add _id virtual to every model so frontend code expecting _id still works
 for (const model of [User, Address, RefreshToken, Product, ProductVariant, CartItem, WishlistItem, RecentlyViewed, Order, Review, Coupon, Banner, Return, Ticket, Newsletter]) {
   const orig = model.prototype.toJSON;
+  const fields = DECIMAL_FIELDS[model.name] || [];
   model.prototype.toJSON = function () {
     const json = orig.call(this);
     json._id = json.id;
+    for (const key of fields) {
+      if (typeof json[key] === 'string') json[key] = parseFloat(json[key]);
+    }
     return json;
   };
 }
