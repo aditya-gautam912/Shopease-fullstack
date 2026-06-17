@@ -16,6 +16,34 @@ const FIXES = [
     title: 'Electric Spin Scrubber — Cordless 3-Speed',
     image: 'https://isorepublic.com/wp-content/uploads/2018/11/cleaning-brush-1100x733.jpg',
   },
+  {
+    title: 'Oversized Teddy Fleece Hoodie',
+    image: 'https://images.pexels.com/photos/702350/pexels-photo-702350.jpeg?auto=compress&w=600',
+  },
+  {
+    title: 'Hand-Poured Soy Candle Gift Set',
+    image: 'https://images.pexels.com/photos/289756/pexels-photo-289756.jpeg?auto=compress&w=600',
+  },
+  {
+    title: 'Smart Digital Air Fryer — 5.8 Quart',
+    image: 'https://images.pexels.com/photos/5237903/pexels-photo-5237903.jpeg?auto=compress&w=600',
+  },
+  {
+    title: 'Professional Yoga Mat — 6mm Non-Slip',
+    image: 'https://images.pexels.com/photos/4498513/pexels-photo-4498513.jpeg?auto=compress&w=600',
+  },
+  {
+    title: 'Micellar Cleansing Water — 400ml',
+    image: 'https://images.pexels.com/photos/8131585/pexels-photo-8131585.jpeg?auto=compress&w=600',
+  },
+  {
+    title: 'Teeth Whitening Kit — LED Accelerator',
+    image: 'https://images.pexels.com/photos/4465829/pexels-photo-4465829.jpeg?auto=compress&w=600',
+  },
+  {
+    title: 'Konjac Facial Sponge — 6 Pack',
+    image: 'https://images.pexels.com/photos/3762482/pexels-photo-3762482.jpeg?auto=compress&w=600',
+  },
 ];
 
 const fixup = async () => {
