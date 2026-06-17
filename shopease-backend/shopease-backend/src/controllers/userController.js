@@ -117,6 +117,21 @@ const setDefaultAddress = asyncHandler(async (req, res) => {
   res.json({ success: true, data: addresses });
 });
 
+const flattenWishlist = (items) =>
+  items.map((item) => {
+    const p = item.Product || item;
+    return {
+      _id: p.id,
+      productId: item.productId ?? item.userId ?? p.id,
+      title: p.title,
+      price: Number(p.price),
+      image: p.image,
+      category: p.category,
+      oldPrice: p.oldPrice ? Number(p.oldPrice) : null,
+      rating: { rate: Number(p.ratingRate) || 0, count: p.ratingCount || 0 },
+    };
+  });
+
 const toggleWishlist = asyncHandler(async (req, res) => {
   const productId = req.params.productId;
 
@@ -124,22 +139,28 @@ const toggleWishlist = asyncHandler(async (req, res) => {
 
   if (existing) {
     await existing.destroy();
-    const wishlist = await WishlistItem.findAll({ where: { userId: req.user.userId } });
-    return res.json({ success: true, data: { wishlist, action: 'removed' } });
+    const wishlist = await WishlistItem.findAll({
+      where: { userId: req.user.userId },
+      include: [{ model: Product, attributes: ['id', 'title', 'price', 'image', 'category', 'ratingRate', 'ratingCount', 'oldPrice'] }],
+    });
+    return res.json({ success: true, data: { wishlist: flattenWishlist(wishlist), action: 'removed' } });
   }
 
   await WishlistItem.create({ userId: req.user.userId, productId });
-  const wishlist = await WishlistItem.findAll({ where: { userId: req.user.userId } });
-  res.json({ success: true, data: { wishlist, action: 'added' } });
+  const wishlist = await WishlistItem.findAll({
+    where: { userId: req.user.userId },
+    include: [{ model: Product, attributes: ['id', 'title', 'price', 'image', 'category', 'ratingRate', 'ratingCount', 'oldPrice'] }],
+  });
+  res.json({ success: true, data: { wishlist: flattenWishlist(wishlist), action: 'added' } });
 });
 
 const getWishlist = asyncHandler(async (req, res) => {
   const items = await WishlistItem.findAll({
     where: { userId: req.user.userId },
-    include: [{ model: Product, attributes: ['id', 'title', 'price', 'image', 'category', 'ratingRate', 'oldPrice'] }],
+    include: [{ model: Product, attributes: ['id', 'title', 'price', 'image', 'category', 'ratingRate', 'ratingCount', 'oldPrice'] }],
   });
 
-  res.json({ success: true, data: items || [] });
+  res.json({ success: true, data: flattenWishlist(items) });
 });
 
 const getAllUsers = asyncHandler(async (req, res) => {

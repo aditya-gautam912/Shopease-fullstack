@@ -66,11 +66,7 @@ const wishlistSlice = createSlice({
         state.error = null;
       })
       .addCase(toggleWishlistItem.fulfilled, (state, action) => {
-        const { productId, action: toggleAction } = action.payload;
-        if (toggleAction === 'removed') {
-          state.items = state.items.filter((item) => item._id !== productId);
-        }
-        // For 'added', we'll refetch to get full product data
+        state.items = action.payload.wishlist;
       })
       .addCase(toggleWishlistItem.rejected, (state, action) => {
         state.error = action.payload;
