@@ -78,6 +78,7 @@ const getCsrfToken = (req, res) => {
 const skipCsrfRoutes = [
   '/api/webhooks',
   '/api/health',
+  '/api/auth',
 ];
 
 const conditionalCsrf = (req, res, next) => {
