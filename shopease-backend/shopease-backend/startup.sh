@@ -11,4 +11,7 @@ if [ "$PRODUCT_COUNT" = "0" ]; then
   node seed/seed.js
 fi
 
+# Apply any data fixups that don't require a full re-seed
+node seed/fixup.js
+
 exec node server.js
