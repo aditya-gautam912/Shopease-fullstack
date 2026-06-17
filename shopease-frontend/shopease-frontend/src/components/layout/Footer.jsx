@@ -100,7 +100,7 @@ export default function Footer() {
             © {new Date().getFullYear()} ShopEase. All rights reserved.
           </p>
           <p className="text-xs text-gray-400 dark:text-gray-500">
-            Built with React + Node.js + MongoDB
+            Built with React + Node.js + PostgreSQL
           </p>
         </div>
       </div>
