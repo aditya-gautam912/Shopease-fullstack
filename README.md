@@ -1,5 +1,7 @@
 # ShopEase Full Stack
 
+Live Demo: https://shopease-store.onrender.com/
+
 ShopEase is a full-stack e-commerce application with real user flows, admin operations, REST APIs, and payment-ready architecture.
 
 - **Frontend**: React + Vite + Redux Toolkit + Capacitor (Android)
