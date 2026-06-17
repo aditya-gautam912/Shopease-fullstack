@@ -72,6 +72,9 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.get('/api/csrf-token', getCsrfToken);
+app.get('/api/config/razorpay-key', (_req, res) => {
+  res.json({ success: true, key: process.env.RAZORPAY_KEY_ID || '' });
+});
 
 app.use('/api', csrfProtection);
 

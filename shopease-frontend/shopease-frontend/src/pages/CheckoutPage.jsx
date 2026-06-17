@@ -12,7 +12,7 @@
  * Razorpay JS SDK is loaded from their CDN on demand.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector }  from 'react-redux';
 import { useForm }                   from 'react-hook-form';
@@ -23,8 +23,7 @@ import { selectCartItems, clearCart } from '../redux/slices/cartSlice';
 import { selectCurrentUser }          from '../redux/slices/authSlice';
 import { orderService }               from '../services/index';
 import { fmtPrice }                   from '../utils/helpers';
-
-const RZP_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID || '';
+import api                           from '../services/api';
 
 // ── Load Razorpay checkout.js from CDN on demand ──────────
 const loadRazorpay = () =>
@@ -143,6 +142,13 @@ export default function CheckoutPage() {
   const [isGuest,   setIsGuest]   = useState(!user);
   const [guestInfo, setGuestInfo] = useState({ email: '', name: '', phone: '' });
   const [useDefaultAddress, setUseDefaultAddress] = useState(false);
+  const [rzpKey,    setRzpKey]    = useState('');
+
+  useEffect(() => {
+    api.get('/config/razorpay-key').then(res => {
+      if (res.data?.key) setRzpKey(res.data.key);
+    }).catch(() => {});
+  }, []);
 
   const { register, handleSubmit, setValue, formState: { errors } } = useForm({
     mode: 'onSubmit', reValidateMode: 'onChange',
@@ -210,7 +216,7 @@ export default function CheckoutPage() {
 
   // ── Razorpay — open popup then confirm order ──────────────
   const placeRazorpay = async () => {
-    const keyId = RZP_KEY || '';
+    const keyId = rzpKey;
     if (!keyId) {
       toast.error('Razorpay is not configured. Add VITE_RAZORPAY_KEY_ID to your .env file.');
       return;
@@ -595,7 +601,7 @@ export default function CheckoutPage() {
           </button>
 
           {/* Test mode hint */}
-          {RZP_KEY && RZP_KEY.includes('_test_') && payMethod !== 'cod' && (
+          {rzpKey && rzpKey.includes('_test_') && payMethod !== 'cod' && (
             <div className="mt-4 p-2 sm:p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg sm:rounded-xl border border-yellow-200 dark:border-yellow-800">
               <p className="text-[10px] sm:text-xs font-bold text-yellow-700 dark:text-yellow-400 mb-1">🧪 Test Mode</p>
               <p className="text-[10px] sm:text-xs text-yellow-600 dark:text-yellow-500 leading-relaxed">
