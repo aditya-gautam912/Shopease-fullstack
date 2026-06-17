@@ -72,20 +72,20 @@ const getProducts = asyncHandler(async (req, res) => {
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findByPk(req.params.id, {
     include: [{ model: ProductVariant, as: 'variants' }],
-    raw: true,
-    nest: true,
   });
 
   if (!product || !product.isActive) {
     return res.status(404).json({ success: false, message: 'Product not found' });
   }
 
+  const productJson = product.toJSON();
+
   if (req.user && req.user.userId) {
     const rv = await RecentlyViewed.findOne({
-      where: { userId: req.user.userId, productId: product.id },
+      where: { userId: req.user.userId, productId: productJson.id },
     });
     if (!rv) {
-      await RecentlyViewed.create({ userId: req.user.userId, productId: product.id });
+      await RecentlyViewed.create({ userId: req.user.userId, productId: productJson.id });
     } else {
       await rv.touch();
     }
@@ -102,12 +102,17 @@ const getProductById = asyncHandler(async (req, res) => {
   }
 
   const related = await Product.findAll({
-    where: { category: product.category, id: { [Op.ne]: product.id }, isActive: true },
+    where: { category: productJson.category, id: { [Op.ne]: productJson.id }, isActive: true },
     limit: 4,
-    raw: true,
   });
 
-  res.json({ success: true, data: { product, related } });
+  res.json({
+    success: true,
+    data: {
+      product: productJson,
+      related: related.map((p) => p.toJSON()),
+    },
+  });
 });
 
 const createProduct = asyncHandler(async (req, res) => {
