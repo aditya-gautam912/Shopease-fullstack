@@ -1,17 +1,9 @@
 {
   "name": "ShopEase",
   "short_name": "ShopEase",
-  "description": "ShopEase online store",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
-  "background_color": "#f9fafb",
-  "theme_color": "#6c63ff",
-  "icons": [
-    {
-      "src": "/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
-    }
-  ]
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "icons": []
 }

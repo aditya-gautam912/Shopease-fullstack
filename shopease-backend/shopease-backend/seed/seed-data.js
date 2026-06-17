@@ -88,4 +88,23 @@ const PRODUCTS = [
   { title: 'Teeth Whitening Kit — LED Accelerator', description: 'Professional-grade teeth whitening kit with 35% carbamide peroxide gel syringes, LED accelerator mouthpiece, and 2 custom-fit trays.', price: 2519, oldPrice: 3779, category: 'beauty', image: 'https://images.unsplash.com/photo-1588776814546-ec7e1a85a302?w=600&q=80', images: ['https://images.unsplash.com/photo-1588776814546-ec7e1a85a302?w=600&q=80'], rating: { rate: 4.3, count: 1890 }, stock: 310 },
 ];
 
-module.exports = { USERS, PRODUCTS, COUPONS };
+const BANNERS = [
+  { title: 'Summer Sale — Up to 50% Off!', description: 'Grab the best deals on electronics, fashion & more', image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1200&q=80', link: '/products?category=electronics', active: true, position: 'hero' },
+  { title: 'New Arrivals in Fashion', description: 'Fresh styles for every wardrobe', image: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&q=80', link: '/products?category=fashion', active: true, position: 'hero' },
+  { title: 'Free Shipping on Orders Above ₹499', description: 'Shop everything you love, delivered free', image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&q=80', link: '/products', active: true, startDate: new Date(), endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), position: 'top-bar' },
+];
+
+const REVIEW_DATA = [
+  { userName: 'Aarav Sharma', rating: 5, title: 'Amazing quality!', body: 'Exceeded my expectations. The product is well-built and works perfectly. Highly recommend!' },
+  { userName: 'Priya Patel', rating: 4, title: 'Great value for money', body: 'Really good product at this price point. Only wish the battery lasted a bit longer.' },
+  { userName: 'Rahul Verma', rating: 5, title: 'Love it!', body: 'Best purchase I have made this year. The quality is top-notch and delivery was fast.' },
+  { userName: 'Sneha Gupta', rating: 4, title: 'Nice product', body: 'Good quality and looks exactly as described. Would buy again.' },
+  { userName: 'Vikram Singh', rating: 3, title: 'Decent, but could be better', body: 'It does the job, but I expected a bit more given the reviews. Still a decent purchase.' },
+  { userName: 'Ananya Reddy', rating: 5, title: 'Perfect!', body: 'Absolutely love this. Worth every rupee. The packaging was also great.' },
+  { userName: 'Rohit Joshi', rating: 4, title: 'Very good', body: 'Satisfied with the purchase. Works as advertised. Shipping was quick.' },
+  { userName: 'Deepika Nair', rating: 5, title: 'Must buy!', body: 'I have been using it for a week now and it is fantastic. The build quality is excellent.' },
+  { userName: 'Arjun Mehta', rating: 2, title: 'Not what I expected', body: 'Had some issues with the product quality. The return process was smooth though.' },
+  { userName: 'Kavita Desai', rating: 4, title: 'Impressive', body: 'Very impressed with the quality and service. Will definitely order more from ShopEase.' },
+];
+
+module.exports = { USERS, PRODUCTS, COUPONS, BANNERS, REVIEW_DATA };
