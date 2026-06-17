@@ -5,7 +5,7 @@
 
 /** Format a number as INR — prices are stored natively in INR */
 export const fmtPrice = (n) =>
-  new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n ?? 0);
+  n ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n) : '—';
 
 /** Get initials from a full name */
 export const getInitials = (name = '') =>
