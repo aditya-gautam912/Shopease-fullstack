@@ -33,15 +33,15 @@ const SORT_OPTIONS = [
 
 const PRICE_OPTIONS = [
   { value: '',           label: 'All Prices' },
-  { value: 'under50',   label: 'Under $50' },
-  { value: '50to150',   label: '$50 – $150' },
-  { value: 'over150',   label: 'Over $150' },
+  { value: 'under50',   label: 'Under ₹4,000' },
+  { value: '50to150',   label: '₹4,000 – ₹12,000' },
+  { value: 'over150',   label: 'Over ₹12,000' },
 ];
 
 const PRICE_MAP = {
-  'under50': { maxPrice: 49.99 },
-  '50to150': { minPrice: 50, maxPrice: 150 },
-  'over150': { minPrice: 150.01 },
+  'under50': { maxPrice: 4000 },
+  '50to150': { minPrice: 4000, maxPrice: 12000 },
+  'over150': { minPrice: 12001 },
 };
 
 export default function ProductGrid({ initialSearch = '' }) {

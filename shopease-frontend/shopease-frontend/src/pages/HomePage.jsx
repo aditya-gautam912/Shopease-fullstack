@@ -34,7 +34,7 @@ export default function HomePage() {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block text-xs font-bold tracking-widest text-primary-400 uppercase mb-4 px-3 py-1 bg-primary-500/10 border border-primary-500/20 rounded-full">
-              🎉 Free shipping on orders over $100
+              🎉 Free shipping on orders over ₹8,500
             </span>
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight mb-6">
               Shop Smarter,
@@ -104,7 +104,7 @@ export default function HomePage() {
       <section className="bg-primary-500 text-white py-12">
         <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
           {[
-            { icon: '🚚', title: 'Free Shipping', sub: 'On orders over $100' },
+            { icon: '🚚', title: 'Free Shipping', sub: 'On orders over ₹8,500' },
             { icon: '↩', title: 'Easy Returns',  sub: '30-day return policy' },
             { icon: '🔒', title: 'Secure Payment', sub: 'SSL encrypted checkout' },
             { icon: '🎧', title: '24/7 Support',  sub: 'Always here to help' },
